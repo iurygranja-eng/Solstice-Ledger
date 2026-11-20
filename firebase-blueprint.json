@@ -1,0 +1,267 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Hero profile, RPG class, financial balances, language level, and tutorial progression.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Firebase Auth UID of the owner." },
+        "heroName": { "type": "string", "description": "Display name of the hero." },
+        "avatarHair": { "type": "integer", "description": "Selected pixel hair index." },
+        "avatarOutfit": { "type": "integer", "description": "Selected pixel outfit index." },
+        "avatarAura": { "type": "string", "description": "Aura theme token (CYAN, MAGENTA, EMERALD, AMBER)." },
+        "financialClass": { "type": "string", "enum": ["GUARDIAN", "EXPLORER", "ALCHEMIST"] },
+        "monthlyNetIncomeCents": { "type": "integer", "description": "Monthly net income in BRL cents." },
+        "checkingBalanceCents": { "type": "integer", "description": "Current checking/cash balance in BRL cents." },
+        "creditCardOpenBillCents": { "type": "integer", "description": "Current open credit card bill in BRL cents." },
+        "emergencyReserveCents": { "type": "integer", "description": "Emergency reserve liquid balance in BRL cents." },
+        "savingsGoalCents": { "type": "integer", "description": "Monthly savings target in BRL cents." },
+        "cycleStartDay": { "type": "integer", "description": "Configurable financial cycle start day (1 to 28)." },
+        "languageLevel": { "type": "integer", "description": "Active UI language level (1, 2, or 3)." },
+        "privacyMode": { "type": "string", "enum": ["TRANSPARENT", "CATEGORY_SUMMARY", "PRIVATE"] },
+        "guildId": { "type": "string", "description": "Optional linked Guilda document ID." },
+        "xpPoints": { "type": "integer", "description": "Financial wisdom experience points." },
+        "hasSeenTour": { "type": "boolean" },
+        "hasSeenInstallmentTip": { "type": "boolean" },
+        "hasSeenTransferTip": { "type": "boolean" },
+        "hasSeenOfxTip": { "type": "boolean" },
+        "unlockedLessons": { "type": "array", "description": "IDs of unlocked Grimório lessons." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp on creation." },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp on update." }
+      },
+      "required": [
+        "userId",
+        "heroName",
+        "avatarHair",
+        "avatarOutfit",
+        "avatarAura",
+        "financialClass",
+        "monthlyNetIncomeCents",
+        "checkingBalanceCents",
+        "creditCardOpenBillCents",
+        "emergencyReserveCents",
+        "savingsGoalCents",
+        "languageLevel",
+        "privacyMode",
+        "xpPoints",
+        "hasSeenTour",
+        "hasSeenInstallmentTip",
+        "hasSeenTransferTip",
+        "hasSeenOfxTip",
+        "unlockedLessons",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "BudgetCategory": {
+      "title": "BudgetCategory",
+      "description": "Percentage-capped budget category belonging to a user.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "name": { "type": "string" },
+        "iconKey": { "type": "string" },
+        "bucket": { "type": "string", "enum": ["ESSENTIAL", "LIFESTYLE", "RESERVE"] },
+        "percentageCap": { "type": "number" },
+        "fixedCost": { "type": "boolean" },
+        "sortOrder": { "type": "integer" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "name", "iconKey", "bucket", "percentageCap", "fixedCost", "sortOrder", "createdAt", "updatedAt"]
+    },
+    "BankAccount": {
+      "title": "BankAccount",
+      "description": "User bank account, wallet, or liquid reserve (Bolsa de Ouro) with balance stored in BRL cents.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Firebase Auth UID of the owner." },
+        "name": { "type": "string", "description": "Account display name." },
+        "institution": { "type": "string", "description": "Financial institution name." },
+        "accountType": { "type": "string", "enum": ["CHECKING", "SAVINGS", "CASH", "INVESTMENT"] },
+        "balanceCents": { "type": "integer", "description": "Current account balance in BRL cents." },
+        "colorHex": { "type": "string", "description": "UI accent hex color." },
+        "iconKey": { "type": "string", "description": "Icon identifier token." },
+        "primaryAccount": { "type": "boolean" },
+        "includeInSafeToSpend": { "type": "boolean" },
+        "archived": { "type": "boolean" },
+        "sortOrder": { "type": "integer" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp on creation." },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp on update." }
+      },
+      "required": [
+        "userId",
+        "name",
+        "institution",
+        "accountType",
+        "balanceCents",
+        "colorHex",
+        "iconKey",
+        "primaryAccount",
+        "includeInSafeToSpend",
+        "archived",
+        "sortOrder",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "TransactionRecord": {
+      "title": "TransactionRecord",
+      "description": "Financial transaction with accrual vs cash tracking, installments, tags, and deduplication hash.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "description": { "type": "string" },
+        "amountCents": { "type": "integer" },
+        "type": { "type": "string", "enum": ["EXPENSE", "INCOME", "TRANSFERENCIA_INTERNA", "PAGAMENTO_FATURA", "ACERTO_GUILDA"] },
+        "paymentMethod": { "type": "string", "enum": ["DEBIT_PIX_CASH", "CREDIT_CARD"] },
+        "categoryId": { "type": "string" },
+        "accountId": { "type": "string", "description": "Optional linked BankAccount document ID." },
+        "cardId": { "type": "string", "description": "Optional linked CreditCard document ID." },
+        "tags": { "type": "array" },
+        "dateEpochDay": { "type": "integer" },
+        "competenceMonth": { "type": "string" },
+        "installmentIndex": { "type": "integer" },
+        "installmentTotal": { "type": "integer" },
+        "installmentGroupId": { "type": "string" },
+        "dedupeHash": { "type": "string" },
+        "sharedGuild": { "type": "boolean" },
+        "paidByUid": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "userId",
+        "description",
+        "amountCents",
+        "type",
+        "paymentMethod",
+        "categoryId",
+        "tags",
+        "dateEpochDay",
+        "competenceMonth",
+        "installmentIndex",
+        "installmentTotal",
+        "installmentGroupId",
+        "dedupeHash",
+        "sharedGuild",
+        "paidByUid",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "GuildVault": {
+      "title": "GuildVault",
+      "description": "Shared couple vault supporting 50/50 or income-proportional splitting and privacy controls.",
+      "type": "object",
+      "properties": {
+        "guildName": { "type": "string" },
+        "inviteCode": { "type": "string" },
+        "ownerId": { "type": "string" },
+        "memberUids": { "type": "array" },
+        "memberNames": { "type": "object" },
+        "memberIncomesCents": { "type": "object" },
+        "memberPrivacy": { "type": "object" },
+        "splitMode": { "type": "string", "enum": ["FIFTY_FIFTY", "PROPORTIONAL"] },
+        "sharedGoalName": { "type": "string" },
+        "sharedGoalTargetCents": { "type": "integer" },
+        "sharedGoalSavedCents": { "type": "integer" },
+        "companionDemoName": { "type": "string" },
+        "companionDemoIncomeCents": { "type": "integer" },
+        "companionDemoPrivacy": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "guildName",
+        "inviteCode",
+        "ownerId",
+        "memberUids",
+        "memberNames",
+        "memberIncomesCents",
+        "memberPrivacy",
+        "splitMode",
+        "sharedGoalName",
+        "sharedGoalTargetCents",
+        "sharedGoalSavedCents",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "GuildInvite": {
+      "title": "GuildInvite",
+      "description": "Lookup record mapping an invite code to a guild ID.",
+      "type": "object",
+      "properties": {
+        "guildId": { "type": "string" },
+        "ownerId": { "type": "string" },
+        "guildName": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["guildId", "ownerId", "guildName", "createdAt"]
+    },
+    "GuildEntry": {
+      "title": "GuildEntry",
+      "description": "Shared expense, goal deposit, or monthly settlement within a Guilda vault.",
+      "type": "object",
+      "properties": {
+        "guildId": { "type": "string" },
+        "memberUids": { "type": "array" },
+        "authorUid": { "type": "string" },
+        "authorName": { "type": "string" },
+        "description": { "type": "string" },
+        "amountCents": { "type": "integer" },
+        "categoryId": { "type": "string" },
+        "entryType": { "type": "string", "enum": ["SHARED_EXPENSE", "SHARED_GOAL_DEPOSIT", "ACERTO_GUILDA"] },
+        "dateEpochDay": { "type": "integer" },
+        "competenceMonth": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "guildId",
+        "memberUids",
+        "authorUid",
+        "authorName",
+        "description",
+        "amountCents",
+        "categoryId",
+        "entryType",
+        "dateEpochDay",
+        "competenceMonth",
+        "createdAt",
+        "updatedAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "Private hero profile, balances, RPG class, and tutorial flags."
+    },
+    "/users/{userId}/budgets/{budgetId}": {
+      "schema": { "$ref": "#/entities/BudgetCategory" },
+      "description": "User's percentage-based budget categories."
+    },
+    "/users/{userId}/accounts/{accountId}": {
+      "schema": { "$ref": "#/entities/BankAccount" },
+      "description": "User's bank accounts, cash wallets, and liquid reserves (Bolsas de Ouro)."
+    },
+    "/users/{userId}/transactions/{txId}": {
+      "schema": { "$ref": "#/entities/TransactionRecord" },
+      "description": "User's transactions, installments, internal transfers, and card bill payments."
+    },
+    "/guilds/{guildId}": {
+      "schema": { "$ref": "#/entities/GuildVault" },
+      "description": "Shared couple Guilda vault with member incomes, privacy settings, and split mode."
+    },
+    "/guildInvites/{inviteCode}": {
+      "schema": { "$ref": "#/entities/GuildInvite" },
+      "description": "Invite code lookup allowing a second partner to join a Guilda."
+    },
+    "/guilds/{guildId}/entries/{entryId}": {
+      "schema": { "$ref": "#/entities/GuildEntry" },
+      "description": "Shared expenses and settlements inside a Guilda."
+    }
+  }
+}

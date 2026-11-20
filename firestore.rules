@@ -1,0 +1,425 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global safety net: deny everything by default
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Reusable primitives
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidTimestamp(ts) {
+      return ts is timestamp && ts <= request.time;
+    }
+
+    // --- Validation Helpers ---
+
+    function isValidUserProfile(data) {
+      return data.userId is string && data.userId.size() >= 1 && data.userId.size() <= 128 &&
+             data.heroName is string && data.heroName.size() >= 1 && data.heroName.size() <= 40 &&
+             data.avatarHair is int && data.avatarHair >= 0 && data.avatarHair <= 10 &&
+             data.avatarOutfit is int && data.avatarOutfit >= 0 && data.avatarOutfit <= 10 &&
+             data.avatarAura is string && data.avatarAura in ['CYAN', 'MAGENTA', 'EMERALD', 'AMBER'] &&
+             data.financialClass is string && data.financialClass in ['GUARDIAN', 'EXPLORER', 'ALCHEMIST'] &&
+             data.monthlyNetIncomeCents is int && data.monthlyNetIncomeCents >= 0 && data.monthlyNetIncomeCents <= 100000000000 &&
+             data.checkingBalanceCents is int && data.checkingBalanceCents >= -100000000000 && data.checkingBalanceCents <= 100000000000 &&
+             data.creditCardOpenBillCents is int && data.creditCardOpenBillCents >= 0 && data.creditCardOpenBillCents <= 100000000000 &&
+             data.emergencyReserveCents is int && data.emergencyReserveCents >= 0 && data.emergencyReserveCents <= 100000000000 &&
+             data.savingsGoalCents is int && data.savingsGoalCents >= 0 && data.savingsGoalCents <= 100000000000 &&
+             (!('cycleStartDay' in data) || (data.cycleStartDay is int && data.cycleStartDay >= 1 && data.cycleStartDay <= 28)) &&
+             data.languageLevel is int && data.languageLevel >= 1 && data.languageLevel <= 3 &&
+             data.privacyMode is string && data.privacyMode in ['TRANSPARENT', 'CATEGORY_SUMMARY', 'PRIVATE'] &&
+             (!('guildId' in data) || data.guildId == null || (data.guildId is string && data.guildId.size() <= 128)) &&
+             data.xpPoints is int && data.xpPoints >= 0 &&
+             data.hasSeenTour is bool &&
+             data.hasSeenInstallmentTip is bool &&
+             data.hasSeenTransferTip is bool &&
+             data.hasSeenOfxTip is bool &&
+             data.unlockedLessons is list && data.unlockedLessons.size() <= 30 &&
+             (data.unlockedLessons.size() == 0 || data.unlockedLessons[0] is string);
+    }
+
+    function isValidBudgetCategory(data) {
+      return data.userId is string && data.userId.size() >= 1 && data.userId.size() <= 128 &&
+             data.name is string && data.name.size() >= 1 && data.name.size() <= 40 &&
+             data.iconKey is string && data.iconKey.size() >= 1 && data.iconKey.size() <= 30 &&
+             data.bucket is string && data.bucket in ['ESSENTIAL', 'LIFESTYLE', 'RESERVE'] &&
+             (data.percentageCap is int || data.percentageCap is float) && data.percentageCap >= 0 && data.percentageCap <= 100 &&
+             data.fixedCost is bool &&
+             data.sortOrder is int && data.sortOrder >= 0 && data.sortOrder <= 50;
+    }
+
+    function isValidBankAccount(data) {
+      return data.userId is string && data.userId.size() >= 1 && data.userId.size() <= 128 &&
+             data.name is string && data.name.size() >= 1 && data.name.size() <= 40 &&
+             data.institution is string && data.institution.size() <= 40 &&
+             data.accountType is string && data.accountType in ['CHECKING', 'SAVINGS', 'CASH', 'INVESTMENT'] &&
+             data.balanceCents is int && data.balanceCents >= -100000000000 && data.balanceCents <= 100000000000 &&
+             data.colorHex is string && data.colorHex.size() >= 4 && data.colorHex.size() <= 16 &&
+             data.iconKey is string && data.iconKey.size() >= 1 && data.iconKey.size() <= 30 &&
+             data.primaryAccount is bool &&
+             data.includeInSafeToSpend is bool &&
+             data.archived is bool &&
+             data.sortOrder is int && data.sortOrder >= 0 && data.sortOrder <= 50;
+    }
+
+    function isValidTransaction(data) {
+      return data.userId is string && data.userId.size() >= 1 && data.userId.size() <= 128 &&
+             data.description is string && data.description.size() >= 1 && data.description.size() <= 120 &&
+             data.amountCents is int && data.amountCents > 0 && data.amountCents <= 100000000000 &&
+             data.type is string && data.type in ['EXPENSE', 'INCOME', 'TRANSFERENCIA_INTERNA', 'PAGAMENTO_FATURA', 'ACERTO_GUILDA'] &&
+             data.paymentMethod is string && data.paymentMethod in ['DEBIT_PIX_CASH', 'CREDIT_CARD'] &&
+             data.categoryId is string && data.categoryId.size() >= 1 && data.categoryId.size() <= 64 &&
+             (!('accountId' in data) || data.accountId == null || (data.accountId is string && data.accountId.size() <= 64)) &&
+             (!('cardId' in data) || data.cardId == null || (data.cardId is string && data.cardId.size() <= 64)) &&
+             data.tags is list && data.tags.size() <= 10 &&
+             (data.tags.size() == 0 || data.tags[0] is string) &&
+             data.dateEpochDay is int && data.dateEpochDay >= 0 &&
+             data.competenceMonth is string && data.competenceMonth.size() == 7 &&
+             data.installmentIndex is int && data.installmentIndex >= 1 && data.installmentIndex <= 60 &&
+             data.installmentTotal is int && data.installmentTotal >= 1 && data.installmentTotal <= 60 &&
+             data.installmentGroupId is string && data.installmentGroupId.size() <= 64 &&
+             data.dedupeHash is string && data.dedupeHash.size() <= 128 &&
+             data.sharedGuild is bool &&
+             data.paidByUid is string && data.paidByUid.size() >= 1 && data.paidByUid.size() <= 128;
+    }
+
+    function isValidGuildVault(data) {
+      return data.guildName is string && data.guildName.size() >= 1 && data.guildName.size() <= 60 &&
+             data.inviteCode is string && data.inviteCode.size() >= 4 && data.inviteCode.size() <= 12 &&
+             data.ownerId is string && data.ownerId.size() >= 1 && data.ownerId.size() <= 128 &&
+             data.memberUids is list && data.memberUids.size() >= 1 && data.memberUids.size() <= 2 &&
+             data.memberUids[0] is string &&
+             data.memberNames is map && data.memberNames.size() <= 2 &&
+             data.memberIncomesCents is map && data.memberIncomesCents.size() <= 2 &&
+             data.memberPrivacy is map && data.memberPrivacy.size() <= 2 &&
+             data.splitMode is string && data.splitMode in ['FIFTY_FIFTY', 'PROPORTIONAL'] &&
+             data.sharedGoalName is string && data.sharedGoalName.size() >= 1 && data.sharedGoalName.size() <= 60 &&
+             data.sharedGoalTargetCents is int && data.sharedGoalTargetCents >= 0 &&
+             data.sharedGoalSavedCents is int && data.sharedGoalSavedCents >= 0 &&
+             (!('companionDemoName' in data) || (data.companionDemoName is string && data.companionDemoName.size() <= 40)) &&
+             (!('companionDemoIncomeCents' in data) || (data.companionDemoIncomeCents is int && data.companionDemoIncomeCents >= 0)) &&
+             (!('companionDemoPrivacy' in data) || (data.companionDemoPrivacy is string && data.companionDemoPrivacy in ['TRANSPARENT', 'CATEGORY_SUMMARY', 'PRIVATE']));
+    }
+
+    function isValidGuildInvite(data) {
+      return data.guildId is string && isValidId(data.guildId) &&
+             data.ownerId is string && data.ownerId.size() >= 1 && data.ownerId.size() <= 128 &&
+             data.guildName is string && data.guildName.size() >= 1 && data.guildName.size() <= 60;
+    }
+
+    function isValidGuildEntry(data) {
+      return data.guildId is string && isValidId(data.guildId) &&
+             data.memberUids is list && data.memberUids.size() >= 1 && data.memberUids.size() <= 2 &&
+             data.memberUids[0] is string &&
+             data.authorUid is string && data.authorUid.size() >= 1 && data.authorUid.size() <= 128 &&
+             data.authorName is string && data.authorName.size() >= 1 && data.authorName.size() <= 40 &&
+             data.description is string && data.description.size() >= 1 && data.description.size() <= 120 &&
+             data.amountCents is int && data.amountCents > 0 && data.amountCents <= 100000000000 &&
+             data.categoryId is string && data.categoryId.size() >= 1 && data.categoryId.size() <= 64 &&
+             data.entryType is string && data.entryType in ['SHARED_EXPENSE', 'SHARED_GOAL_DEPOSIT', 'ACERTO_GUILDA'] &&
+             data.dateEpochDay is int && data.dateEpochDay >= 0 &&
+             data.competenceMonth is string && data.competenceMonth.size() == 7;
+    }
+
+    // --- Collection Rules ---
+
+    match /users/{userId} {
+      allow get: if isSignedIn() && request.auth.uid == userId && isValidId(userId);
+      allow list: if false;
+
+      allow create: if isSignedIn() &&
+                       isValidId(userId) &&
+                       request.auth.uid == userId &&
+                       incoming().userId == request.auth.uid &&
+                       incoming().keys().hasAll([
+                         'userId', 'heroName', 'avatarHair', 'avatarOutfit', 'avatarAura',
+                         'financialClass', 'monthlyNetIncomeCents', 'checkingBalanceCents',
+                         'creditCardOpenBillCents', 'emergencyReserveCents', 'savingsGoalCents',
+                         'languageLevel', 'privacyMode', 'xpPoints',
+                         'hasSeenTour', 'hasSeenInstallmentTip', 'hasSeenTransferTip', 'hasSeenOfxTip',
+                         'unlockedLessons', 'createdAt', 'updatedAt'
+                       ]) &&
+                       incoming().keys().hasOnly([
+                         'userId', 'heroName', 'avatarHair', 'avatarOutfit', 'avatarAura',
+                         'financialClass', 'monthlyNetIncomeCents', 'checkingBalanceCents',
+                         'creditCardOpenBillCents', 'emergencyReserveCents', 'savingsGoalCents',
+                         'cycleStartDay', 'languageLevel', 'privacyMode', 'guildId', 'xpPoints',
+                         'hasSeenTour', 'hasSeenInstallmentTip', 'hasSeenTransferTip', 'hasSeenOfxTip',
+                         'unlockedLessons', 'createdAt', 'updatedAt'
+                       ]) &&
+                       isValidTimestamp(incoming().createdAt) &&
+                       isValidTimestamp(incoming().updatedAt) &&
+                       isValidUserProfile(incoming());
+
+      allow update: if isSignedIn() &&
+                       isValidId(userId) &&
+                       request.auth.uid == userId &&
+                       isValidUserProfile(incoming()) &&
+                       incoming().userId == existing().userId &&
+                       incoming().createdAt == existing().createdAt &&
+                       isValidTimestamp(incoming().updatedAt) &&
+                       incoming().diff(existing()).affectedKeys().hasOnly([
+                         'heroName', 'avatarHair', 'avatarOutfit', 'avatarAura',
+                         'financialClass', 'monthlyNetIncomeCents', 'checkingBalanceCents',
+                         'creditCardOpenBillCents', 'emergencyReserveCents', 'savingsGoalCents',
+                         'cycleStartDay', 'languageLevel', 'privacyMode', 'guildId', 'xpPoints',
+                         'hasSeenTour', 'hasSeenInstallmentTip', 'hasSeenTransferTip', 'hasSeenOfxTip',
+                         'unlockedLessons', 'updatedAt'
+                       ]);
+
+      allow delete: if isSignedIn() && isValidId(userId) && request.auth.uid == userId;
+
+      match /budgets/{budgetId} {
+        allow list: if isSignedIn() && request.auth.uid == userId;
+        allow get: if isSignedIn() && request.auth.uid == userId && isValidId(userId) && isValidId(budgetId);
+
+        allow create: if isSignedIn() &&
+                         isValidId(userId) &&
+                         isValidId(budgetId) &&
+                         request.auth.uid == userId &&
+                         incoming().userId == request.auth.uid &&
+                         incoming().keys().hasAll([
+                           'userId', 'name', 'iconKey', 'bucket', 'percentageCap', 'fixedCost', 'sortOrder', 'createdAt', 'updatedAt'
+                         ]) &&
+                         incoming().keys().hasOnly([
+                           'userId', 'name', 'iconKey', 'bucket', 'percentageCap', 'fixedCost', 'sortOrder', 'createdAt', 'updatedAt'
+                         ]) &&
+                         isValidTimestamp(incoming().createdAt) &&
+                         isValidTimestamp(incoming().updatedAt) &&
+                         isValidBudgetCategory(incoming());
+
+        allow update: if isSignedIn() &&
+                         isValidId(userId) &&
+                         isValidId(budgetId) &&
+                         request.auth.uid == userId &&
+                         isValidBudgetCategory(incoming()) &&
+                         incoming().userId == existing().userId &&
+                         incoming().createdAt == existing().createdAt &&
+                         isValidTimestamp(incoming().updatedAt) &&
+                         incoming().diff(existing()).affectedKeys().hasOnly([
+                           'name', 'iconKey', 'bucket', 'percentageCap', 'fixedCost', 'sortOrder', 'updatedAt'
+                         ]);
+
+        allow delete: if isSignedIn() && isValidId(userId) && isValidId(budgetId) && request.auth.uid == userId;
+      }
+
+      match /accounts/{accountId} {
+        allow list: if isSignedIn() && request.auth.uid == userId;
+        allow get: if isSignedIn() && request.auth.uid == userId && isValidId(userId) && isValidId(accountId);
+
+        allow create: if isSignedIn() &&
+                         isValidId(userId) &&
+                         isValidId(accountId) &&
+                         request.auth.uid == userId &&
+                         incoming().userId == request.auth.uid &&
+                         incoming().keys().hasAll([
+                           'userId', 'name', 'institution', 'accountType', 'balanceCents',
+                           'colorHex', 'iconKey', 'primaryAccount', 'includeInSafeToSpend',
+                           'archived', 'sortOrder', 'createdAt', 'updatedAt'
+                         ]) &&
+                         incoming().keys().hasOnly([
+                           'userId', 'name', 'institution', 'accountType', 'balanceCents',
+                           'colorHex', 'iconKey', 'primaryAccount', 'includeInSafeToSpend',
+                           'archived', 'sortOrder', 'createdAt', 'updatedAt'
+                         ]) &&
+                         isValidTimestamp(incoming().createdAt) &&
+                         isValidTimestamp(incoming().updatedAt) &&
+                         isValidBankAccount(incoming());
+
+        allow update: if isSignedIn() &&
+                         isValidId(userId) &&
+                         isValidId(accountId) &&
+                         request.auth.uid == userId &&
+                         isValidBankAccount(incoming()) &&
+                         incoming().userId == existing().userId &&
+                         incoming().createdAt == existing().createdAt &&
+                         isValidTimestamp(incoming().updatedAt) &&
+                         incoming().diff(existing()).affectedKeys().hasOnly([
+                           'name', 'institution', 'accountType', 'balanceCents',
+                           'colorHex', 'iconKey', 'primaryAccount', 'includeInSafeToSpend',
+                           'archived', 'sortOrder', 'updatedAt'
+                         ]);
+
+        allow delete: if isSignedIn() && isValidId(userId) && isValidId(accountId) && request.auth.uid == userId;
+      }
+
+      match /transactions/{txId} {
+        allow list: if isSignedIn() && request.auth.uid == userId;
+        allow get: if isSignedIn() && request.auth.uid == userId && isValidId(userId) && isValidId(txId);
+
+        allow create: if isSignedIn() &&
+                         isValidId(userId) &&
+                         isValidId(txId) &&
+                         request.auth.uid == userId &&
+                         incoming().userId == request.auth.uid &&
+                         incoming().keys().hasAll([
+                           'userId', 'description', 'amountCents', 'type', 'paymentMethod', 'categoryId',
+                           'tags', 'dateEpochDay', 'competenceMonth', 'installmentIndex', 'installmentTotal',
+                           'installmentGroupId', 'dedupeHash', 'sharedGuild', 'paidByUid', 'createdAt', 'updatedAt'
+                         ]) &&
+                         incoming().keys().hasOnly([
+                           'userId', 'description', 'amountCents', 'type', 'paymentMethod', 'categoryId',
+                           'accountId', 'cardId', 'tags', 'dateEpochDay', 'competenceMonth',
+                           'installmentIndex', 'installmentTotal', 'installmentGroupId', 'dedupeHash',
+                           'sharedGuild', 'paidByUid', 'createdAt', 'updatedAt'
+                         ]) &&
+                         isValidTimestamp(incoming().createdAt) &&
+                         isValidTimestamp(incoming().updatedAt) &&
+                         isValidTransaction(incoming());
+
+        allow update: if isSignedIn() &&
+                         isValidId(userId) &&
+                         isValidId(txId) &&
+                         request.auth.uid == userId &&
+                         isValidTransaction(incoming()) &&
+                         incoming().userId == existing().userId &&
+                         incoming().createdAt == existing().createdAt &&
+                         isValidTimestamp(incoming().updatedAt) &&
+                         incoming().diff(existing()).affectedKeys().hasOnly([
+                           'description', 'amountCents', 'type', 'paymentMethod', 'categoryId',
+                           'accountId', 'cardId', 'tags', 'dateEpochDay', 'competenceMonth',
+                           'sharedGuild', 'updatedAt'
+                         ]);
+
+        allow delete: if isSignedIn() && isValidId(userId) && isValidId(txId) && request.auth.uid == userId;
+      }
+    }
+
+    match /guildInvites/{inviteCode} {
+      allow get: if isSignedIn() && isValidId(inviteCode);
+      allow list: if false;
+
+      allow create: if isSignedIn() &&
+                       isValidId(inviteCode) &&
+                       incoming().ownerId == request.auth.uid &&
+                       incoming().keys().hasAll(['guildId', 'ownerId', 'guildName', 'createdAt']) &&
+                       incoming().keys().hasOnly(['guildId', 'ownerId', 'guildName', 'createdAt']) &&
+                       isValidTimestamp(incoming().createdAt) &&
+                       isValidGuildInvite(incoming()) &&
+                       existsAfter(/databases/$(database)/documents/guilds/$(incoming().guildId));
+
+      allow update: if false;
+      allow delete: if isSignedIn() && isValidId(inviteCode) && existing().ownerId == request.auth.uid;
+    }
+
+    match /guilds/{guildId} {
+      allow list: if isSignedIn() && request.auth.uid in resource.data.memberUids;
+      allow get: if isSignedIn() && isValidId(guildId) && request.auth.uid in existing().memberUids;
+
+      allow create: if isSignedIn() &&
+                       isValidId(guildId) &&
+                       incoming().ownerId == request.auth.uid &&
+                       request.auth.uid in incoming().memberUids &&
+                       incoming().keys().hasAll([
+                         'guildName', 'inviteCode', 'ownerId', 'memberUids', 'memberNames',
+                         'memberIncomesCents', 'memberPrivacy', 'splitMode',
+                         'sharedGoalName', 'sharedGoalTargetCents', 'sharedGoalSavedCents',
+                         'createdAt', 'updatedAt'
+                       ]) &&
+                       incoming().keys().hasOnly([
+                         'guildName', 'inviteCode', 'ownerId', 'memberUids', 'memberNames',
+                         'memberIncomesCents', 'memberPrivacy', 'splitMode',
+                         'sharedGoalName', 'sharedGoalTargetCents', 'sharedGoalSavedCents',
+                         'companionDemoName', 'companionDemoIncomeCents', 'companionDemoPrivacy',
+                         'createdAt', 'updatedAt'
+                       ]) &&
+                       isValidTimestamp(incoming().createdAt) &&
+                       isValidTimestamp(incoming().updatedAt) &&
+                       isValidGuildVault(incoming());
+
+      allow update: if isSignedIn() &&
+                       isValidId(guildId) &&
+                       isValidGuildVault(incoming()) &&
+                       incoming().ownerId == existing().ownerId &&
+                       incoming().inviteCode == existing().inviteCode &&
+                       incoming().createdAt == existing().createdAt &&
+                       isValidTimestamp(incoming().updatedAt) &&
+                       (
+                         // Action 1: Existing member updates guild settings, incomes, privacy, or shared goal
+                         (
+                           request.auth.uid in existing().memberUids &&
+                           incoming().memberUids == existing().memberUids &&
+                           incoming().diff(existing()).affectedKeys().hasOnly([
+                             'guildName', 'memberNames', 'memberIncomesCents', 'memberPrivacy',
+                             'splitMode', 'sharedGoalName', 'sharedGoalTargetCents', 'sharedGoalSavedCents',
+                             'companionDemoName', 'companionDemoIncomeCents', 'companionDemoPrivacy',
+                             'updatedAt'
+                           ])
+                         ) ||
+                         // Action 2: Second partner joins via valid invite
+                         (
+                           existing().memberUids.size() == 1 &&
+                           !(request.auth.uid in existing().memberUids) &&
+                           incoming().memberUids.size() == 2 &&
+                           existing().memberUids[0] in incoming().memberUids &&
+                           request.auth.uid in incoming().memberUids &&
+                           incoming().diff(existing()).affectedKeys().hasOnly([
+                             'memberUids', 'memberNames', 'memberIncomesCents', 'memberPrivacy', 'updatedAt'
+                           ])
+                         )
+                       );
+
+      allow delete: if isSignedIn() && isValidId(guildId) && existing().ownerId == request.auth.uid;
+
+      match /entries/{entryId} {
+        allow list: if isSignedIn() && request.auth.uid in resource.data.memberUids;
+        allow get: if isSignedIn() && isValidId(guildId) && isValidId(entryId) && request.auth.uid in existing().memberUids;
+
+        allow create: if isSignedIn() &&
+                         isValidId(guildId) &&
+                         isValidId(entryId) &&
+                         incoming().guildId == guildId &&
+                         incoming().authorUid == request.auth.uid &&
+                         request.auth.uid in incoming().memberUids &&
+                         incoming().keys().hasAll([
+                           'guildId', 'memberUids', 'authorUid', 'authorName', 'description',
+                           'amountCents', 'categoryId', 'entryType', 'dateEpochDay', 'competenceMonth',
+                           'createdAt', 'updatedAt'
+                         ]) &&
+                         incoming().keys().hasOnly([
+                           'guildId', 'memberUids', 'authorUid', 'authorName', 'description',
+                           'amountCents', 'categoryId', 'entryType', 'dateEpochDay', 'competenceMonth',
+                           'createdAt', 'updatedAt'
+                         ]) &&
+                         isValidTimestamp(incoming().createdAt) &&
+                         isValidTimestamp(incoming().updatedAt) &&
+                         isValidGuildEntry(incoming()) &&
+                         existsAfter(/databases/$(database)/documents/guilds/$(guildId)) &&
+                         request.auth.uid in getAfter(/databases/$(database)/documents/guilds/$(guildId)).data.memberUids &&
+                         incoming().memberUids == getAfter(/databases/$(database)/documents/guilds/$(guildId)).data.memberUids;
+
+        allow update: if isSignedIn() &&
+                         isValidId(guildId) &&
+                         isValidId(entryId) &&
+                         request.auth.uid in existing().memberUids &&
+                         isValidGuildEntry(incoming()) &&
+                         incoming().guildId == existing().guildId &&
+                         incoming().authorUid == existing().authorUid &&
+                         incoming().createdAt == existing().createdAt &&
+                         isValidTimestamp(incoming().updatedAt) &&
+                         incoming().diff(existing()).affectedKeys().hasOnly([
+                           'description', 'amountCents', 'categoryId', 'memberUids', 'updatedAt'
+                         ]);
+
+        allow delete: if isSignedIn() && isValidId(guildId) && isValidId(entryId) && request.auth.uid in existing().memberUids;
+      }
+    }
+  }
+}

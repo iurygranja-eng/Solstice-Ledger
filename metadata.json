@@ -1,0 +1,6 @@
+{
+  "name": "Solstice Ledger",
+  "description": "Aplicativo de gestão financeira pessoal e para casais gamificado em estilo RPG 16-bit com motor contábil por competência, projeções estatísticas, modo Guilda e assistente Oráculo com IA.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

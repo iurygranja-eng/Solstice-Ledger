@@ -1,0 +1,2529 @@
+<!-- Mapa das Estrelas - 5 Indicadores RPG 32-Bit -->
+<!DOCTYPE html><html lang="pt-BR"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+<title>Solstice Ledger — RPG Financeiro 16-Bit</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@500;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            pixel: ['"Press Start 2P"', 'monospace'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            twilight: {
+              start: '#0b1120',
+              mid: '#15193b',
+              end: '#281c52',
+            },
+            rpg: {
+              card: '#161938',
+              cardInner: '#1e224a',
+              border: '#4338ca',
+              borderGlow: '#6366f1',
+              cyan: '#38bdf8',
+              magenta: '#f472b6',
+              emerald: '#34d399',
+              amber: '#fbbf24',
+              crimson: '#f87171',
+              gold: '#fbbf24'
+            }
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    /* Custom RPG styling */
+    .rpg-box {
+      background: linear-gradient(180deg, #1b1e42 0%, #131633 100%);
+      border: 2px solid rgba(99, 102, 241, 0.45);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      position: relative;
+    }
+    .rpg-box-cyan {
+      border-color: rgba(56, 189, 248, 0.5);
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.15), inset 0 1px 0 rgba(56, 189, 248, 0.2);
+    }
+    .rpg-corner-dots::before, .rpg-corner-dots::after {
+      content: '';
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: #38bdf8;
+    }
+    .rpg-corner-dots::before { top: 2px; left: 2px; }
+    .rpg-corner-dots::after { top: 2px; right: 2px; }
+
+    .glow-cyan {
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+    }
+    .glow-magenta {
+      box-shadow: 0 0 15px rgba(244, 114, 182, 0.4);
+    }
+    .glow-emerald {
+      box-shadow: 0 0 15px rgba(52, 211, 153, 0.4);
+    }
+
+    /* Scanline effect optional toggle */
+    .pixel-scanlines {
+      background: linear-gradient(rgba(18, 16, 38, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+      background-size: 100% 4px;
+      pointer-events: none;
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0d1026;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #312e81;
+      border-radius: 4px;
+    }
+    
+    /* Pixelated avatar canvas */
+    .pixel-avatar {
+      image-rendering: pixelated;
+    }
+  </style>
+<meta content="mobile_tab" name="shell-type"></head>
+<body class="bg-[#090d1a] text-slate-100 font-sans min-h-screen antialiased selection:bg-indigo-500 selection:text-white pb-24">
+<!-- Mobile Frame Container (max-w-md for optimal mobile-first feel) -->
+<div class="max-w-md mx-auto min-h-screen bg-gradient-to-b from-[#0b1022] via-[#12163b] to-[#1c1947] relative flex flex-col shadow-2xl border-x border-indigo-950/60" id="app">
+<!-- TOP GLOBAL HUD: LANGUAGE SELECTOR & REALM/GUILD SWITCH -->
+<header class="sticky top-0 z-40 bg-[#0d122b]/95 backdrop-blur-md border-b border-indigo-500/30 px-3 py-2.5"><div class="flex items-center justify-between gap-2 mb-2">
+<div class="flex items-center gap-2.5">
+<div class="w-9 h-9 rounded-lg p-0.5 relative group shadow-lg flex-shrink-0 border border-cyan-400/40 bg-gradient-to-br from-[#1a234f] via-[#0f1430] to-[#2c133f] flex items-center justify-center overflow-hidden">
+<svg class="w-5 h-5 drop-shadow-[0_0_8px_rgba(56,189,248,0.8)]" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M12 2L18 8L12 22L6 8L12 2Z" fill="url(#crystalGradStars)" stroke="#e0f2fe" stroke-width="0.8"></path>
+<path d="M12 2L12 22" stroke="rgba(255,255,255,0.7)" stroke-width="0.6"></path>
+<path d="M6 8H18" stroke="rgba(255,255,255,0.5)" stroke-width="0.6"></path>
+<circle cx="12" cy="8" fill="#fef08a" r="1.5"></circle>
+<defs>
+<linearGradient gradientUnits="userSpaceOnUse" id="crystalGradStars" x1="6" x2="18" y1="2" y2="22">
+<stop stop-color="#38bdf8"></stop>
+<stop offset="0.5" stop-color="#818cf8"></stop>
+<stop offset="1" stop-color="#f472b6"></stop>
+</linearGradient>
+</defs>
+</svg>
+<div class="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-cyan-300 blur-[1px]"></div>
+</div>
+<div>
+<div class="flex items-center gap-1.5">
+<span class="font-bold text-xs tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-cyan-200 via-white to-pink-200 drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)] font-sans"><span style="font-family: &quot;Space Grotesk&quot;; letter-spacing: 0.6px;">PIXEL CASH</span></span>
+<span class="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded text-cyan-300 border border-cyan-400/50 bg-[#12163b]">32-BIT</span>
+</div>
+<p class="text-[10px] text-slate-300 font-semibold tracking-wide flex items-center gap-1" id="sub-header-role">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block shadow-[0_0_6px_#34d399]"></span> Guardião da Luz • Nvl 14
+      </p>
+</div>
+</div>
+<div class="flex items-center bg-[#0d122d] p-0.5 rounded-lg border border-indigo-400/40 shadow-inner">
+<button class="px-2.5 py-1 rounded text-xs font-semibold text-slate-400 hover:text-slate-200 transition-all" id="btn-mode-solo" onclick="setRealm('SOLO')">Solo</button>
+<button class="px-2.5 py-1 rounded text-xs font-bold transition-all bg-gradient-to-b from-pink-500/30 to-indigo-700/40 text-pink-200 border border-pink-400/50 shadow-sm flex items-center gap-1" id="btn-mode-guild" onclick="setRealm('GUILDA')">
+<span>Guilda</span>
+<span class="w-1.5 h-1.5 rounded-full bg-pink-400 animate-pulse shadow-[0_0_6px_#f472b6]"></span>
+</button>
+</div>
+</div>
+<div class="flex items-center justify-between gap-1.5 bg-[#090d21]/90 p-1 rounded-lg border border-indigo-500/30 text-[11px] shadow-inner">
+<div class="text-[9px] font-mono text-indigo-300 pl-1 uppercase tracking-wider flex items-center gap-1 font-bold">
+<svg class="w-3 h-3 text-cyan-400 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+    Tom:
+  </div>
+<div class="flex gap-1 flex-1 justify-end">
+<button class="px-2 py-0.5 rounded text-[10px] font-medium transition-all text-slate-400 hover:text-white" id="lang-btn-1" onclick="setLanguageLevel(1)">1. Fácil</button>
+<button class="px-2 py-0.5 rounded text-[10px] font-medium transition-all text-slate-400 hover:text-white" id="lang-btn-2" onclick="setLanguageLevel(2)">2. Médio (RPG+Trad)</button>
+<button class="px-2.5 py-0.5 rounded text-[10px] font-semibold transition-all bg-gradient-to-r from-indigo-700/80 to-indigo-900 text-cyan-200 border border-cyan-400/50 shadow-sm" id="lang-btn-3" onclick="setLanguageLevel(3)">3. RPG 32-Bit</button>
+</div>
+</div></header>
+<!-- CONTENT VIEWS -->
+<main class="flex-1 px-3 py-3 space-y-4"><div class="flex flex-col w-full space-y-4 pb-8">
+<!-- HEADER DO MAPA DAS ESTRELAS (SISTEMA 2) -->
+<section class="rpg-box rounded-xl p-3.5 border-indigo-400/40 relative overflow-hidden">
+<div class="absolute -top-10 -right-10 w-32 h-32 bg-cyan-500/15 rounded-full blur-2xl pointer-events-none"></div>
+<div class="flex items-center justify-between gap-2 mb-1.5 relative z-10">
+<div class="flex items-center gap-1.5">
+<span class="w-5 h-5 rounded-md border border-cyan-400/40 bg-cyan-950/60 flex items-center justify-center text-cyan-300 text-xs shadow">✦</span>
+<span class="font-mono text-[10px] uppercase tracking-wider text-cyan-300 font-bold">Sistema 2 • Projeção Preditiva</span>
+</div>
+<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-[#0d1538] text-cyan-300 border border-cyan-400/50 shadow-sm">
+        Dia 15/30 • 50%
+      </span>
+</div>
+<h1 class="text-sm font-bold tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-cyan-200 via-white to-pink-200 uppercase drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+      Mapa das Estrelas (Projeções)
+    </h1>
+<p class="text-[11px] text-slate-300 mt-1 leading-relaxed">
+      O telescópio astral da guilda prevê o destino dos seus tesouros. Visualize o alinhamento das faturas invisíveis e o horizonte dos próximos ciclos.
+    </p>
+<!-- SELETOR DE CICLO / CONSTELAÇÃO -->
+<div class="mt-3 p-1 rounded-lg bg-[#0a0e24] border border-indigo-500/30 flex gap-1 shadow-inner">
+<button class="flex-1 py-1 px-2 rounded text-[10px] font-bold bg-gradient-to-b from-cyan-500/30 to-indigo-700/40 text-cyan-200 border border-cyan-400/50 shadow-sm flex items-center justify-center gap-1.5" id="btn-period-current" onclick="changeStarCycle('current')">
+<span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_6px_#38bdf8]"></span>
+<span>Ciclo Atual</span>
+</button>
+<button class="flex-1 py-1 px-2 rounded text-[10px] font-medium text-slate-400 hover:text-white transition-all flex items-center justify-center gap-1" id="btn-period-quarter" onclick="changeStarCycle('quarter')">
+<span>Trimestre Astral</span>
+</button>
+<button class="flex-1 py-1 px-2 rounded text-[10px] font-medium text-slate-400 hover:text-white transition-all flex items-center justify-center gap-1" id="btn-period-semester" onclick="changeStarCycle('semester')">
+<span>Semestre Cósmico</span>
+</button>
+</div>
+<!-- CHIPS DE FILTRO DE TAGS TRANSVERSAIS -->
+<div class="mt-2.5 flex items-center gap-1.5 overflow-x-auto pb-0.5 no-scrollbar text-[10px]">
+<span class="text-indigo-300 font-mono text-[9px] uppercase font-bold mr-0.5 flex-shrink-0">Filtro:</span>
+<button class="px-2 py-0.5 rounded text-[10px] bg-gradient-to-r from-cyan-500/30 to-indigo-600/40 text-cyan-200 border border-cyan-400/50 font-bold shadow-sm flex-shrink-0" onclick="toggleTagFilter(this, 'all')">
+        Global
+      </button>
+<button class="px-2 py-0.5 rounded text-[10px] bg-[#12163b] text-pink-300 hover:text-white border border-pink-500/30 font-medium shadow-sm flex-shrink-0 flex items-center gap-1" onclick="toggleTagFilter(this, 'viagem')">
+<span>#ViagemFérias</span>
+<span class="text-slate-400 font-mono text-[9px]">R$ 1.840</span>
+</button>
+<button class="px-2 py-0.5 rounded text-[10px] bg-[#12163b] text-cyan-300 hover:text-white border border-indigo-500/30 font-medium shadow-sm flex-shrink-0 flex items-center gap-1" onclick="toggleTagFilter(this, 'reforma')">
+<span>#Reforma</span>
+<span class="text-slate-400 font-mono text-[9px]">R$ 920</span>
+</button>
+<button class="px-2 py-0.5 rounded text-[10px] bg-[#12163b] text-amber-300 hover:text-white border border-indigo-500/30 font-medium shadow-sm flex-shrink-0 flex items-center gap-1" onclick="toggleTagFilter(this, 'pet')">
+<span>#Pet</span>
+<span class="text-slate-400 font-mono text-[9px]">R$ 380</span>
+</button>
+</div>
+</section>
+<!-- 1. RITMO DE GASTO (BURN RATE) -->
+<div class="rpg-box rounded-xl p-3.5 border-indigo-400/40 relative overflow-hidden">
+<div class="flex items-start justify-between gap-3 mb-2">
+<div class="flex items-center gap-2">
+<div class="w-7 h-7 rounded-lg border border-pink-500/40 bg-pink-950/60 flex items-center justify-center text-pink-300 text-xs shadow">
+          🔥
+        </div>
+<div>
+<span class="text-[10px] font-bold text-amber-400 uppercase tracking-wider block">1. Ritmo de Gasto (Burn Rate)</span>
+<h2 class="text-xs font-bold text-white tracking-wide mt-0.5">Alimentação sob Tensão</h2>
+</div>
+</div>
+<button class="w-5 h-5 rounded-full bg-indigo-950 border border-indigo-400/40 text-cyan-300 hover:text-white text-[10px] flex items-center justify-center font-bold" onclick="openExplainerModal('burn_rate')">
+        ?
+      </button>
+</div>
+<div class="p-2.5 rounded-lg bg-[#0a0e24] border border-indigo-500/30 mt-2 shadow-inner">
+<div class="flex justify-between items-baseline mb-1.5 font-mono text-[11px]">
+<span class="text-slate-400 uppercase font-semibold text-[10px]">Consumo Real</span>
+<span class="text-pink-400 font-bold drop-shadow-[0_0_4px_rgba(244,114,182,0.4)]">82% Gasto (R$ 1.230)</span>
+</div>
+<div class="relative w-full h-3.5 bg-[#090d24] rounded-md overflow-hidden p-0.5 border border-indigo-500/30 relative shadow-inner">
+<div class="h-full rounded bg-gradient-to-r from-amber-500 via-rose-500 to-pink-500 relative" style="width: 82%;">
+<div class="absolute inset-x-0 top-0 h-[40%] bg-white/30 rounded-t"></div>
+</div>
+<div class="absolute top-0 bottom-0 w-1 bg-cyan-300 shadow-[0_0_8px_#38bdf8] z-20 -ml-0.5" style="left: 50%;"></div>
+</div>
+<div class="flex justify-between items-center text-[10px] font-mono mt-1.5">
+<span class="text-cyan-300 font-semibold">▲ Marcador: Dia 15 (50%)</span>
+<span class="text-pink-400 font-semibold">82% Consumido</span>
+</div>
+</div>
+<div class="mt-2.5 space-y-1.5 text-xs">
+<div class="flex items-start gap-2 p-2 rounded-lg bg-[#191535] border border-amber-500/30 text-[11px]">
+<span class="text-amber-400 font-bold flex-shrink-0">⚡ TENSÃO:</span>
+<p class="text-slate-200 leading-snug">
+          Previsão de Término do Teto: <strong class="text-amber-300 font-semibold">Dia 21 de Outubro</strong> (-9 dias antes do fechamento do ciclo).
+        </p>
+</div>
+<div class="flex items-start gap-2 p-2 rounded-lg bg-[#0e163b] border border-cyan-400/30 text-[11px]">
+<span class="text-cyan-300 font-bold flex-shrink-0">⚔️ AÇÃO:</span>
+<p class="text-slate-200 leading-snug">
+          Segure <strong class="text-cyan-300 font-mono font-bold">R$ 38,00/dia</strong> em banquetes e entregas nos próximos 5 dias para realinhar a trajetória cósmica.
+        </p>
+</div>
+</div>
+</div>
+<!-- 2. SALDO PROJETADO DE FECHAMENTO -->
+<div class="rpg-box rounded-xl p-3.5 border-indigo-400/40 relative overflow-hidden">
+<div class="flex items-start justify-between gap-3 mb-2">
+<div class="flex items-center gap-2">
+<div class="w-7 h-7 rounded-lg border border-cyan-400/40 bg-cyan-950/60 flex items-center justify-center text-cyan-300 text-xs shadow">
+          ⚖️
+        </div>
+<div>
+<span class="text-[10px] font-bold text-emerald-400 uppercase tracking-wider block">2. Saldo Projetado de Fechamento</span>
+<h2 class="text-xs font-bold text-white tracking-wide mt-0.5">Previsão no Dia 30</h2>
+</div>
+</div>
+<button class="w-5 h-5 rounded-full bg-indigo-950 border border-indigo-400/40 text-cyan-300 hover:text-white text-[10px] flex items-center justify-center font-bold" onclick="openExplainerModal('closing_balance')">
+        ?
+      </button>
+</div>
+<div class="flex items-baseline justify-between p-3 rounded-lg bg-[#0a0e24] border border-indigo-500/30 mt-1 shadow-inner">
+<div>
+<div class="font-mono text-2xl font-black text-emerald-300 drop-shadow-[0_0_8px_rgba(52,211,153,0.5)]">
+          +R$ 840,00
+        </div>
+<div class="text-[10px] text-slate-300 flex items-center gap-1.5 mt-0.5">
+<span class="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_6px_#34d399]"></span>
+<span>Zona Segura • Sem resgate forçado do baú</span>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-gradient-to-r from-emerald-600/30 to-emerald-900/50 border border-emerald-400/50 text-emerald-300 shadow-[0_0_8px_rgba(52,211,153,0.25)]">
+        ✓ Positivo
+      </span>
+</div>
+<div class="mt-2.5 p-2 rounded-lg bg-[#0e122b] border border-indigo-500/30 font-mono text-[10px] space-y-1 text-slate-300">
+<div class="flex justify-between items-center text-white font-bold pb-1 border-b border-indigo-500/20">
+<span>Fórmula Transparente:</span>
+<span class="text-emerald-300 font-bold">+R$ 840,00</span>
+</div>
+<div class="grid grid-cols-2 gap-x-2 gap-y-1 text-[10px] pt-1">
+<span class="text-cyan-300">Saldo em Caixa: +R$ 2.450</span>
+<span class="text-pink-300">Fixos Pendentes: -R$ 1.850</span>
+<span class="text-emerald-300">Receita Prevista: +R$ 1.500</span>
+<span class="text-pink-300">Fatura Aberta: -R$ 820</span>
+<span class="text-slate-400 col-span-2">Gastos Variáveis Estimados restantes: -R$ 440</span>
+</div>
+</div>
+</div>
+<!-- 3. COMPROMETIMENTO FUTURO (RENDA PRÉ-OCUPADA) -->
+<div class="rpg-box rounded-xl p-3.5 border-indigo-400/40 relative overflow-hidden">
+<div class="flex items-start justify-between gap-3 mb-2">
+<div class="flex items-center gap-2">
+<div class="w-7 h-7 rounded-lg border border-indigo-400/40 bg-indigo-950/60 flex items-center justify-center text-cyan-300 text-xs shadow">
+          ⏳
+        </div>
+<div>
+<span class="text-[10px] font-bold text-cyan-400 uppercase tracking-wider block">3. Comprometimento Futuro</span>
+<h2 class="text-xs font-bold text-white tracking-wide mt-0.5">Renda Pré-Ocupada</h2>
+</div>
+</div>
+<button class="w-5 h-5 rounded-full bg-indigo-950 border border-indigo-400/40 text-cyan-300 hover:text-white text-[10px] flex items-center justify-center font-bold" onclick="openExplainerModal('future_commit')">
+        ?
+      </button>
+</div>
+<div class="flex items-baseline justify-between mb-2">
+<div class="font-mono text-base text-white font-bold">
+        38% <span class="text-xs text-slate-400 font-sans font-normal">da renda líquida em Nov</span>
+</div>
+<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-[#0d1538] text-cyan-300 border border-cyan-400/50 shadow-sm">
+        Confortável (&lt;50%)
+      </span>
+</div>
+<div class="grid grid-cols-3 gap-2 p-2.5 rounded-lg bg-[#0a0e24] border border-indigo-500/30 shadow-inner">
+<div class="flex flex-col items-center gap-1">
+<span class="text-[10px] text-slate-300 font-bold font-mono">Novembro</span>
+<div class="w-full bg-[#0d1029] h-20 rounded border border-indigo-500/30 relative flex items-end p-0.5">
+<div class="w-full rounded bg-gradient-to-t from-cyan-600 via-indigo-500 to-pink-500 relative" style="height: 38%;">
+<div class="absolute inset-x-0 top-0 h-[40%] bg-white/30 rounded-t"></div>
+</div>
+<span class="absolute inset-0 flex items-center justify-center font-mono text-[10px] font-bold text-white drop-shadow">38%</span>
+</div>
+<span class="font-mono text-[10px] text-cyan-300">R$ 2.470</span>
+</div>
+<div class="flex flex-col items-center gap-1">
+<span class="text-[10px] text-slate-300 font-bold font-mono">Dezembro</span>
+<div class="w-full bg-[#0d1029] h-20 rounded border border-indigo-500/30 relative flex items-end p-0.5">
+<div class="w-full rounded bg-gradient-to-t from-indigo-600 via-cyan-500 to-teal-400 relative" style="height: 26%;">
+<div class="absolute inset-x-0 top-0 h-[40%] bg-white/30 rounded-t"></div>
+</div>
+<span class="absolute inset-0 flex items-center justify-center font-mono text-[10px] font-bold text-white drop-shadow">26%</span>
+</div>
+<span class="font-mono text-[10px] text-cyan-300">R$ 1.690</span>
+</div>
+<div class="flex flex-col items-center gap-1">
+<span class="text-[10px] text-slate-300 font-bold font-mono">Janeiro</span>
+<div class="w-full bg-[#0d1029] h-20 rounded border border-indigo-500/30 relative flex items-end p-0.5">
+<div class="w-full rounded bg-gradient-to-t from-emerald-600 to-emerald-400 relative" style="height: 14%;">
+<div class="absolute inset-x-0 top-0 h-[40%] bg-white/30 rounded-t"></div>
+</div>
+<span class="absolute inset-0 flex items-center justify-center font-mono text-[10px] font-bold text-white drop-shadow">14%</span>
+</div>
+<span class="font-mono text-[10px] text-emerald-400 font-semibold">R$ 910</span>
+</div>
+</div>
+<p class="text-[11px] text-slate-300 mt-2 leading-relaxed">
+      ✨ <strong class="text-white">Caminho Desimpedido:</strong> Suas parcelas diminuem gradualmente nos solstícios seguintes, liberando R$ 1.560 extras em Janeiro.
+    </p>
+</div>
+<!-- 4. SAFE-TO-SPEND ADAPTATIVO -->
+<div class="rpg-box rounded-xl p-3.5 border-cyan-400/50 bg-gradient-to-br from-[#192353] via-[#12173a] to-[#0a0f26] relative overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.6)]">
+<div class="absolute -right-6 -bottom-6 w-32 h-32 bg-cyan-400/15 rounded-full blur-2xl pointer-events-none"></div>
+<div class="flex items-start justify-between gap-3 mb-2 relative z-10">
+<div class="flex items-center gap-2">
+<div class="w-7 h-7 rounded-lg border border-cyan-400/60 bg-cyan-950/60 flex items-center justify-center text-cyan-300 text-xs shadow">
+          🛡️
+        </div>
+<div>
+<span class="text-[10px] font-bold text-cyan-300 uppercase tracking-wider block">4. Safe-to-Spend Adaptativo</span>
+<h2 class="text-xs font-bold text-white tracking-wide mt-0.5">Limite de Mana Diário</h2>
+</div>
+</div>
+<button class="w-5 h-5 rounded-full bg-cyan-950/80 border border-cyan-400/40 text-cyan-300 hover:text-white text-[10px] flex items-center justify-center font-bold" onclick="openExplainerModal('safe_spend')">
+        ?
+      </button>
+</div>
+<div class="flex items-center justify-between p-3 rounded-lg bg-[#0b0f2a]/90 border border-cyan-400/30 mt-1 shadow-inner relative z-10">
+<div>
+<div class="font-mono text-2xl font-black text-white drop-shadow-[0_2px_8px_rgba(56,189,248,0.4)]">
+          R$ 85,00 <span class="text-xs font-sans text-slate-400 font-normal">/ dia</span>
+</div>
+<div class="text-[10px] font-mono text-slate-300 mt-0.5">
+          Calculado para os 16 dias restantes de Outubro
+        </div>
+</div>
+<div class="text-right font-mono">
+<div class="text-xs text-pink-400 line-through">R$ 112,00</div>
+<div class="text-[9px] text-pink-300 font-bold uppercase bg-pink-950/60 px-1.5 py-0.5 rounded border border-pink-500/30 mt-0.5">-24% Ajustado</div>
+</div>
+</div>
+<div class="mt-2 bg-[#0b0f2a]/85 p-2 rounded-lg border border-indigo-400/30 text-[11px] text-slate-200 flex items-start gap-2 relative z-10 shadow-inner">
+<span class="text-cyan-300 text-xs mt-0.5">✦</span>
+<p class="leading-relaxed">
+        Ajustado automaticamente após o imprevisto mecânico em Transporte (R$ 120), blindando a meta da <strong class="text-cyan-300">#ViagemFérias</strong> sem criar novas dívidas.
+      </p> </div>
+</div>
+<!-- 5. HORIZONTE DO ESCUDO DE RESERVA (RUNWAY) -->
+<div class="rpg-box rounded-xl p-3.5 border-indigo-400/40 relative overflow-hidden">
+<div class="flex items-start justify-between gap-3 mb-2">
+<div class="flex items-center gap-2">
+<div class="w-7 h-7 rounded-lg border border-indigo-400/40 bg-indigo-950/60 flex items-center justify-center text-cyan-300 text-xs shadow">
+          💎
+        </div>
+<div>
+<span class="text-[10px] font-bold text-pink-300 uppercase tracking-wider block">5. Horizonte do Escudo (Runway)</span>
+<h2 class="text-xs font-bold text-white tracking-wide mt-0.5">Reserva de Sobrevivência</h2>
+</div>
+</div>
+<button class="w-5 h-5 rounded-full bg-indigo-950 border border-indigo-400/40 text-cyan-300 hover:text-white text-[10px] flex items-center justify-center font-bold" onclick="openExplainerModal('reserve_shield')">
+        ?
+      </button>
+</div>
+<div class="p-2.5 rounded-lg bg-[#0a0e24] border border-indigo-500/30 mt-1 shadow-inner">
+<div class="flex justify-between items-baseline mb-1.5">
+<div>
+<span class="font-mono text-base font-bold text-white">4.2 Meses</span>
+<span class="text-[10px] text-slate-400 font-mono block">R$ 17.640 guardados (Custo Essencial: R$ 4.200/mês)</span>
+</div>
+<div class="text-right font-mono">
+<span class="text-[10px] text-cyan-300 font-bold block">Meta: 6.0 Meses</span>
+<span class="text-[10px] text-slate-400 block">R$ 25.200</span>
+</div>
+</div>
+<div class="relative w-full h-3.5 bg-[#090d24] rounded-md overflow-hidden p-0.5 border border-indigo-500/30 relative shadow-inner">
+<div class="h-full rounded bg-gradient-to-r from-cyan-400 via-indigo-400 to-pink-500 relative" style="width: 70%;">
+<div class="absolute inset-x-0 top-0 h-[40%] bg-white/30 rounded-t"></div>
+</div>
+</div>
+<div class="flex justify-between items-center text-[10px] font-mono mt-1.5">
+<span class="text-emerald-300 font-semibold">70% Concluído</span>
+<span class="text-cyan-300 font-semibold">Faltam R$ 7.560</span>
+</div>
+</div>
+<div class="mt-2 bg-[#0e122b] p-2 rounded-lg border border-indigo-500/30 text-[11px] text-slate-300 flex items-start gap-2">
+<span class="text-amber-300 text-xs mt-0.5">✨</span>
+<p class="leading-relaxed">
+        Mantendo o aporte da guilda de <strong class="text-white font-mono">R$ 750/mês</strong>, o 6º mês de proteção absoluta será forjado no <strong class="text-cyan-300">Equinócio de Março</strong>.
+      </p>
+</div>
+</div>
+<!-- CALENDÁRIO ASTRAL DE PARCELAS -->
+<div class="rpg-box rounded-xl p-3.5 border-indigo-400/40 relative overflow-hidden">
+<div class="flex items-center justify-between mb-2">
+<div class="flex items-center gap-1.5">
+<span class="text-xs">💳</span>
+<h2 class="text-xs font-bold text-white tracking-wide uppercase">
+          Calendário Astral de Parcelas
+        </h2>
+</div>
+<span class="text-[10px] font-mono text-cyan-300 px-1.5 py-0.5 rounded bg-cyan-950/60 border border-cyan-500/30">Próximos 90 dias</span>
+</div>
+<div class="rounded-lg border border-indigo-500/30 overflow-hidden divide-y divide-indigo-900/40 text-xs font-mono">
+<div class="p-2.5 bg-[#0e122b] flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded bg-indigo-950 border border-indigo-500/30 flex items-center justify-center text-xs">💻</div>
+<div>
+<div class="text-white font-bold font-sans text-xs">Notebook Arcano</div>
+<div class="text-[10px] text-slate-400 flex items-center gap-1 mt-0.5">
+<span class="text-cyan-300">Parc. 4/10</span> • <span class="text-pink-300">#Trabalho</span>
+</div>
+</div>
+</div>
+<div class="text-right">
+<div class="text-pink-400 font-bold">-R$ 320,00</div>
+<span class="text-[9px] text-slate-400 block">Até Julho</span>
+</div>
+</div>
+<div class="p-2.5 bg-[#0e122b] flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded bg-indigo-950 border border-indigo-500/30 flex items-center justify-center text-xs">⛺</div>
+<div>
+<div class="text-white font-bold font-sans text-xs">Equipamento de Aventura</div>
+<div class="text-[10px] text-slate-400 flex items-center gap-1 mt-0.5">
+<span class="text-cyan-300">Parc. 2/3</span> • <span class="text-pink-300">#Lazer</span>
+</div>
+</div>
+</div>
+<div class="text-right">
+<div class="text-pink-400 font-bold">-R$ 180,00</div>
+<span class="text-[9px] text-emerald-400 block">Quita em Nov</span>
+</div>
+</div>
+<div class="p-2.5 bg-[#0e122b] flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded bg-indigo-950 border border-indigo-500/30 flex items-center justify-center text-xs">⚙️</div>
+<div>
+<div class="text-white font-bold font-sans text-xs">Manutenção do Teletransporte</div>
+<div class="text-[10px] text-slate-400 flex items-center gap-1 mt-0.5">
+<span class="text-cyan-300">Parc. 1/2</span> • <span class="text-pink-300">#Transporte</span>
+</div>
+</div>
+</div>
+<div class="text-right">
+<div class="text-pink-400 font-bold">-R$ 250,00</div>
+<span class="text-[9px] text-emerald-400 block">Quita em Dez</span>
+</div>
+</div>
+<div class="p-2.5 bg-[#090d24] flex items-center justify-between text-[11px]">
+<span class="text-slate-400 uppercase font-bold text-[10px]">Total Bloqueado em Novembro:</span>
+<span class="text-pink-400 font-bold">-R$ 750,00</span>
+</div>
+</div>
+</div>
+<!-- SIMULADOR INTERATIVO DO ORÁCULO (COMPRA PARCELADA) -->
+<div class="rpg-box rounded-xl p-3.5 border-indigo-400/40 relative overflow-hidden">
+<div class="flex items-center justify-between mb-2">
+<div class="flex items-center gap-1.5">
+<span class="text-cyan-300 text-xs">🔮</span>
+<h3 class="text-xs font-bold text-white tracking-wide">Simular Nova Compra Parcelada</h3>
+</div>
+<span class="text-[9px] font-mono text-cyan-300 px-1.5 py-0.5 rounded bg-cyan-950/60 border border-cyan-500/30 uppercase font-bold">
+        Previsão Ativa
+      </span>
+</div>
+<p class="text-[11px] text-slate-300 mb-2.5 leading-snug">
+      Descubra o impacto de uma nova despesa no seu Índice de Comprometimento antes de puxar a espada do cartão.
+    </p>
+<div class="space-y-2.5 p-2.5 rounded-lg bg-[#0a0e24] border border-indigo-500/30 shadow-inner">
+<div class="flex gap-2">
+<div class="flex-1">
+<label class="block text-[10px] text-slate-400 uppercase font-mono font-semibold mb-1">Valor Total (R$)</label>
+<input class="w-full bg-[#0d122b] text-white font-mono text-xs p-2 rounded-lg border border-indigo-500/40 focus:outline-none focus:border-cyan-400 shadow-inner" id="sim-amount" placeholder="Ex: 600" type="number" value="600">
+</div>
+<div class="w-1/3">
+<label class="block text-[10px] text-slate-400 uppercase font-mono font-semibold mb-1">Parcelas</label>
+<select class="w-full bg-[#0d122b] text-white font-mono text-xs p-2 rounded-lg border border-indigo-500/40 focus:outline-none focus:border-cyan-400 shadow-inner" id="sim-installments">
+<option value="3">3x</option>
+<option selected="" value="6">6x</option>
+<option value="10">10x</option>
+<option value="12">12x</option>
+</select>
+</div>
+</div>
+<div class="p-2 rounded-lg bg-[#0e122b] border border-indigo-500/30 flex items-center justify-between text-xs font-mono" id="sim-result-box">
+<div>
+<span class="text-slate-400 block text-[10px]">Impacto Mensal:</span>
+<span class="text-cyan-300 font-bold" id="sim-impact-value">R$ 100,00 / mês</span>
+</div>
+<div class="text-right">
+<span class="text-slate-400 block text-[10px]">Comprometimento Nov:</span>
+<span class="text-pink-400 font-bold" id="sim-impact-percent">38% → 39.5%</span>
+</div>
+</div>
+<button class="w-full py-2.5 rounded-lg bg-gradient-to-r from-cyan-500 via-indigo-600 to-pink-500 text-white font-bold text-xs shadow-md hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-1.5" onclick="runSimulation()">
+<span>⚔️</span> Calcular Impacto no Destino
+      </button>
+</div>
+</div>
+<!-- GRIMÓRIO DE SABEDORIA (KAHNEMAN SISTEMA 1 VS SISTEMA 2) -->
+<div class="rpg-box rounded-xl p-3.5 border-indigo-400/40 relative overflow-hidden bg-gradient-to-br from-[#161b3d] to-[#12142e]">
+<div class="flex items-center gap-2 mb-1">
+<span class="text-xs">📜</span>
+<span class="text-[10px] uppercase font-bold text-cyan-300 font-mono">Grimório Astral • Sabedoria Comportamental</span>
+</div>
+<h4 class="text-xs font-bold text-white tracking-wide">
+      O Paradoxo da Disponibilidade (Daniel Kahneman)
+    </h4>
+<p class="text-[11px] text-slate-300 leading-relaxed mt-1">
+      O cérebro impulsivo (<em>Sistema 1</em>) enxerga apenas o saldo livre de hoje (R$ 2.450) e tem a falsa ilusão de riqueza. O <strong class="text-cyan-200">Mapa das Estrelas (Sistema 2)</strong> força a mente a computar as faturas invisíveis de amanhã antes de agir.
+    </p>
+</div>
+<!-- BOTÃO ÉPICO INFERIOR: CONSULTAR O ORÁCULO SOBRE OS 5 INDICADORES -->
+<div class="pt-1 pb-4">
+<button class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-cyan-500 via-indigo-600 to-pink-500 text-white font-bold text-xs uppercase tracking-wider shadow-lg hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-2 border border-cyan-300/40" onclick="askOracleAboutMap()">
+<span class="text-sm">🔮</span>
+<span>Consultar o Oráculo sobre estes 5 Indicadores</span>
+</button>
+</div>
+</div></main>
+<!-- ================= GLOBAL BOTTOM NAVIGATION (5 TABS) ================= -->
+<nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-[#0a0e24]/95 backdrop-blur-md border-t border-indigo-500/30 px-2 py-1.5 z-50 flex items-center justify-around"><button class="flex flex-col items-center gap-0.5 py-1 px-2 rounded-lg text-slate-400 hover:text-white transition-all" id="nav-tavern" onclick="switchTab('tavern')">
+<span class="text-base">🏰</span>
+<span class="text-[9px] font-medium tracking-tight">Taverna</span>
+</button>
+<button class="flex flex-col items-center gap-0.5 py-1 px-2 rounded-lg text-cyan-300 transition-all" id="nav-stars" onclick="switchTab('stars')">
+<span class="text-base drop-shadow-[0_0_8px_#38bdf8]">🌌</span>
+<span class="text-[9px] font-bold tracking-tight text-cyan-200">Mapa</span>
+</button>
+<!-- Center Action Button: Forja de Lançamento 32-Bit -->
+<button class="relative -top-2 flex flex-col items-center" id="nav-forge" onclick="switchTab('forge')">
+<div class="w-11 h-11 rounded-full p-[2px] shadow-lg shadow-cyan-900/60 hover:scale-105 active:scale-95 transition-all flex items-center justify-center relative border border-cyan-400/60 bg-gradient-to-tr from-[#0f172a] via-[#1e293b] to-[#38bdf8]/50">
+<div class="w-full h-full bg-[#12163b] rounded-full flex items-center justify-center text-lg text-white shadow-inner">
+      ⚔️
+    </div>
+<div class="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-cyan-300 blur-[1px]"></div>
+</div>
+<span class="text-[8px] font-bold text-cyan-200 mt-0.5 tracking-wider uppercase">Forjar</span>
+</button>
+<button class="flex flex-col items-center gap-0.5 py-1 px-2 rounded-lg text-slate-400 hover:text-white transition-all" id="nav-guild" onclick="switchTab('guild')">
+<span class="text-base">🛡️</span>
+<span class="text-[9px] font-medium tracking-tight">Guilda</span>
+</button>
+<button class="flex flex-col items-center gap-0.5 py-1 px-2 rounded-lg text-slate-400 hover:text-white transition-all relative" id="nav-oracle" onclick="switchTab('oracle')">
+<span class="text-base">🔮</span>
+<span class="text-[9px] font-medium tracking-tight">Oráculo</span>
+<span class="absolute top-1 right-2 w-1.5 h-1.5 rounded-full bg-pink-400"></span>
+</button></nav>
+<!-- ================= EXPLAINER MODAL (O QUE SIGNIFICA ESTE GRÁFICO?) ================= -->
+<div class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4" id="explainer-modal">
+<div class="rpg-box rounded-2xl p-4 max-w-sm w-full border-cyan-400/60 bg-[#141738] space-y-3 relative">
+<div class="flex items-center justify-between border-b border-indigo-500/30 pb-2">
+<div class="flex items-center gap-1.5">
+<span class="text-cyan-400 text-sm">✦</span>
+<h3 class="text-xs font-bold text-white uppercase tracking-wider" id="modal-title">Entender Indicador</h3>
+</div>
+<button class="text-slate-400 hover:text-white font-bold text-sm" onclick="closeExplainerModal()">✕</button>
+</div>
+<!-- 3 Blocks Structured Explanation -->
+<div class="space-y-2 text-xs">
+<!-- Block 1: O que é -->
+<div class="p-2.5 rounded-lg bg-[#0e122b] border border-indigo-500/20">
+<span class="text-[10px] font-bold text-cyan-300 uppercase block mb-0.5">1. O que este número mostra</span>
+<p class="text-slate-300 text-[11px] leading-relaxed" id="modal-desc"></p>
+</div>
+<!-- Block 2: Situação Atual -->
+<div class="p-2.5 rounded-lg bg-[#0e122b] border border-emerald-500/20">
+<span class="text-[10px] font-bold text-emerald-400 uppercase block mb-0.5">2. Como está sua situação agora</span>
+<p class="text-slate-200 text-[11px] leading-relaxed" id="modal-current-status"></p>
+</div>
+</div>
+<!-- Block 3: Perguntar ao Oráculo -->
+<div class="pt-1 flex gap-2">
+<button class="flex-1 py-2 rounded-lg bg-gradient-to-r from-cyan-500 to-indigo-600 text-white font-bold text-xs shadow hover:brightness-110" id="modal-oracle-btn" onclick="askOracleFromModal()">
+            🔮 Perguntar ao Oráculo sobre isso
+          </button>
+<button class="px-3 py-2 rounded-lg bg-indigo-950 text-slate-300 border border-indigo-500/40 text-xs" onclick="closeExplainerModal()">
+            Fechar
+          </button>
+</div>
+</div>
+</div>
+</div>
+<!-- APPLICATION LOGIC & MOCK STATE SCRIPT -->
+<script>
+    // --- 1. STATE MANAGEMENT (Com persistência e demonstração realista) ---
+    const APP_STATE = {
+      languageLevel: 2, // 1: Fácil, 2: Médio, 3: Difícil (RPG 16-bit)
+      currentRealm: 'SOLO', // 'SOLO' or 'GUILDA'
+      activeTab: 'tavern',
+      selectedCategory: 'Alimentação',
+      txMethod: 'CAIXA', // 'CAIXA' (Débito/Pix) or 'CARTAO' (Crédito)
+      installments: 1,
+      currentDay: 15,
+      daysInMonth: 30,
+      user: {
+        name: 'Valere',
+        className: 'Guardião',
+        level: 14,
+        xp: 840,
+        monthlyIncome: 6500.00,
+        reserveBalance: 21000.00,
+        monthlyFixedCosts: 2400.00,
+      },
+      categories: [
+        { id: 'Alimentação', icon: '🍔', budget: 1500, spent: 1230, percentIncome: 23 },
+        { id: 'Transporte', icon: '🚗', budget: 700, spent: 450, percentIncome: 11 },
+        { id: 'Moradia', icon: '🏠', budget: 2000, spent: 2000, percentIncome: 31 },
+        { id: 'Lazer', icon: '🎮', budget: 600, spent: 290, percentIncome: 9 },
+        { id: 'Saúde', icon: '💊', budget: 500, spent: 180, percentIncome: 8 },
+        { id: 'Reserva', icon: '💎', budget: 1200, spent: 1200, percentIncome: 18 },
+      ],
+      transactions: [
+        { id: 'tx-1', desc: 'Restaurante Lua Crescente', amount: 84.00, cat: 'Alimentação', method: 'CARTAO', date: 'Hoje', tag: '#Lazer' },
+        { id: 'tx-2', desc: 'Combustível Posto Astral', amount: 120.00, cat: 'Transporte', method: 'CAIXA', date: 'Ontem', tag: '#Trabalho' },
+        { id: 'tx-3', desc: 'Supermercado do Reino', amount: 340.50, cat: 'Alimentação', method: 'CAIXA', date: '13/10', tag: '#Casa' },
+        { id: 'tx-4', desc: 'Aluguel do Refúgio', amount: 2000.00, cat: 'Moradia', method: 'CAIXA', date: '05/10', tag: '#Fixo' },
+      ],
+      guild: {
+        partnerName: 'Zale',
+        splitRatioValere: 50,
+        valerePaid: 2450.00,
+        zalePaid: 1850.00,
+      }
+    };
+
+    // --- 2. LANGUAGE DICTIONARY (Mapeamento dos 3 Níveis de Linguagem) ---
+    const DICTIONARY = {
+      1: {
+        safeSpend: "Limite Seguro Diário",
+        breakEven: "Mínimo para Pagar as Contas (Ponto de Equilíbrio)",
+        shieldName: "Reserva de Segurança Financeira",
+        shieldDesc: "4.2 meses garantidos (R$ 21.000)",
+        wisdom: "Nível de Controle",
+        categoriesTitle: "Tetos de Gastos por Categoria",
+        starsTitle: "Projeções e Histórico Detalhado",
+        oracleTitle: "Assistente Financeiro IA",
+      },
+      2: {
+        safeSpend: "Limite Seguro Diário (Safe-to-Spend)",
+        breakEven: "Linha de Equilíbrio (Ponto de Equilíbrio)",
+        shieldName: "Escudo de Reserva",
+        shieldDesc: "4.2 meses de sobrevivência garantidos",
+        wisdom: "Sabedoria Financeira",
+        categoriesTitle: "Tetos de Mana por Categoria",
+        starsTitle: "Mapa das Estrelas (Projeções)",
+        oracleTitle: "O Oráculo Financeiro (IA)",
+      },
+      3: {
+        safeSpend: "Gasto de Mana Seguro Diário ❓",
+        breakEven: "Selo de Sobrevivência da Campanha ❓",
+        shieldName: "Escudo de Éter Cristalino ❓",
+        shieldDesc: "4.2 luas de sustentação no baú",
+        wisdom: "Grimório Astral",
+        categoriesTitle: "Recipientes Mágicos de Mana",
+        starsTitle: "Constelações do Destino",
+        oracleTitle: "O Oráculo da Guilda ❓",
+      }
+    };
+
+    // --- 3. STATISTICAL & ACCOUNTING ENGINE CALCULATIONS ---
+    function calculateSafeToSpend() {
+      // (RendaLiquida - MetaPoupanca - CustosFixos - GastosRealizadosNoMes) / DiasRestantesNoMes
+      const totalSpent = APP_STATE.categories.reduce((acc, c) => acc + c.spent, 0);
+      const remainingDays = APP_STATE.daysInMonth - APP_STATE.currentDay + 1; // 16 dias
+      // R$ 6500 - R$ 1200 - R$ 2400 - R$ 1550 = ~ R$ 1350 / 16 = R$ 84,37
+      const availableRemaining = Math.max(0, (APP_STATE.user.monthlyIncome - 1200 - totalSpent));
+      return (availableRemaining / remainingDays).toFixed(2);
+    }
+
+    // --- 4. RENDER PROCEDURES ---
+    function renderApp() {
+      const dict = DICTIONARY[APP_STATE.languageLevel];
+
+      // Update text items with dictionary
+      const termSafe = document.getElementById('term-safe-spend');
+      if (termSafe) termSafe.textContent = dict.safeSpend;
+
+      const termBreak = document.getElementById('term-break-even');
+      if (termBreak) termBreak.textContent = dict.breakEven;
+
+      const termShield = document.getElementById('term-shield-name');
+      if (termShield) termShield.textContent = dict.shieldName;
+
+      const termShieldDesc = document.getElementById('term-shield-desc');
+      if (termShieldDesc) termShieldDesc.textContent = dict.shieldDesc;
+
+      const termWisdom = document.getElementById('label-wisdom');
+      if (termWisdom) termWisdom.textContent = dict.wisdom;
+
+      const termCats = document.getElementById('term-categories-title');
+      if (termCats) termCats.textContent = dict.categoriesTitle;
+
+      const termStars = document.getElementById('label-stars-title');
+      if (termStars) termStars.textContent = dict.starsTitle;
+
+      const termOracle = document.getElementById('term-oracle-title');
+      if (termOracle) termOracle.textContent = dict.oracleTitle;
+
+      // Update Category Progress Bars with Vertical Day Marker (Day 15/30 = 50%)
+      renderCategoryBars();
+
+      // Update Recent Transactions
+      renderRecentTransactions();
+
+      // Update safe to spend value
+      const safeVal = document.getElementById('val-safe-spend');
+      if (safeVal) safeVal.textContent = `R$ ${calculateSafeToSpend().replace('.', ',')}`;
+    }
+
+    function renderCategoryBars() {
+      const container = document.getElementById('category-bars-list');
+      if (!container) return;
+
+      const dayPercent = (APP_STATE.currentDay / APP_STATE.daysInMonth) * 100; // 50%
+
+      container.innerHTML = APP_STATE.categories.map(cat => {
+        const spentPercent = Math.min(100, Math.round((cat.spent / cat.budget) * 100));
+        
+        // Semantic Pre-Attentive colors:
+        // If spentPercent > dayPercent + 15 -> Amber / Crimson
+        let barColor = 'from-cyan-400 to-indigo-500';
+        let statusBadge = '';
+        
+        if (spentPercent >= 100) {
+          barColor = 'from-red-500 to-rose-600';
+          statusBadge = '<span class="text-[9px] text-red-400 font-bold">Estourado</span>';
+        } else if (spentPercent > dayPercent + 20) {
+          barColor = 'from-amber-400 to-orange-500';
+          statusBadge = '<span class="text-[9px] text-amber-300 font-bold">Ritmo Alto!</span>';
+        } else {
+          barColor = 'from-emerald-400 to-cyan-400';
+          statusBadge = '<span class="text-[9px] text-emerald-400 font-medium">Equilibrado</span>';
+        }
+
+        return `
+          <div class="space-y-1">
+            <div class="flex justify-between items-center text-xs">
+              <div class="flex items-center gap-1.5">
+                <span>${cat.icon}</span>
+                <span class="font-semibold text-slate-200">${cat.id}</span>
+                <button onclick="openExplainerModal('cat_${cat.id}')" class="text-indigo-400 hover:text-cyan-300 text-[10px]">?</button>
+              </div>
+              <div class="flex items-center gap-2 font-mono">
+                ${statusBadge}
+                <span class="text-slate-300 font-medium">R$ ${cat.spent} <span class="text-slate-500">/ R$ ${cat.budget}</span></span>
+              </div>
+            </div>
+
+            <!-- Bar with Day Marker -->
+            <div class="relative w-full h-3 bg-slate-900 rounded-md overflow-hidden p-0.5 border border-indigo-500/20">
+              <!-- Spent Progress -->
+              <div class="h-full rounded bg-gradient-to-r ${barColor}" style="width: ${spentPercent}%;"></div>
+
+              <!-- Vertical Day-of-Month Benchmark line (Dia 15 = 50%) -->
+              <div class="absolute top-0 bottom-0 w-0.5 bg-cyan-300 shadow-[0_0_5px_#38bdf8] z-10" style="left: ${dayPercent}%;" title="Dia atual do mês (Dia 15)"></div>
+            </div>
+            <div class="flex justify-between text-[9px] text-slate-500 font-mono">
+              <span>0%</span>
+              <span class="text-cyan-400/80">▲ Marcador: Dia 15 (50%)</span>
+              <span>100% (Teto)</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderRecentTransactions() {
+      const container = document.getElementById('recent-transactions-list');
+      if (!container) return;
+
+      container.innerHTML = APP_STATE.transactions.map(t => {
+        const isCard = t.method === 'CARTAO';
+        return `
+          <div class="py-2 flex items-center justify-between text-xs">
+            <div class="flex items-center gap-2">
+              <div class="w-6 h-6 rounded bg-indigo-950 flex items-center justify-center text-[10px] border border-indigo-500/30">
+                ${isCard ? '💳' : '💵'}
+              </div>
+              <div>
+                <div class="font-medium text-slate-200 truncate max-w-[170px]">${t.desc}</div>
+                <div class="text-[10px] text-slate-400 flex items-center gap-1">
+                  <span>${t.date}</span> • <span class="text-indigo-300">${t.cat}</span> • <span class="text-pink-300 font-mono">${t.tag}</span>
+                </div>
+              </div>
+            </div>
+            <div class="text-right">
+              <div class="font-mono font-bold text-pink-400">-R$ ${t.amount.toFixed(2).replace('.', ',')}</div>
+              <span class="text-[8px] uppercase px-1 rounded ${isCard ? 'bg-pink-950 text-pink-300 border border-pink-500/40' : 'bg-cyan-950 text-cyan-300 border border-cyan-500/40'}">
+                ${isCard ? 'Fatura' : 'Caixa'}
+              </span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // --- 5. UI CONTROLLERS ---
+    function setLanguageLevel(level) {
+      APP_STATE.languageLevel = level;
+      for (let i = 1; i <= 3; i++) {
+        const btn = document.getElementById(`lang-btn-${i}`);
+        if (btn) {
+          if (i === level) {
+            btn.className = "px-2 py-0.5 rounded text-[10px] font-medium transition-all bg-indigo-800/80 text-cyan-300 border border-cyan-400/40";
+          } else {
+            btn.className = "px-2 py-0.5 rounded text-[10px] font-medium transition-all text-slate-400 hover:text-white";
+          }
+        }
+      }
+      renderApp();
+    }
+
+    function setRealm(realm) {
+      APP_STATE.currentRealm = realm;
+      const btnSolo = document.getElementById('btn-mode-solo');
+      const btnGuild = document.getElementById('btn-mode-guild');
+      
+      if (realm === 'SOLO') {
+        btnSolo.className = "px-2.5 py-1 rounded text-xs font-semibold transition-all bg-gradient-to-r from-cyan-500/20 to-indigo-600/30 text-cyan-300 border border-cyan-400/30";
+        btnGuild.className = "px-2.5 py-1 rounded text-xs font-semibold text-slate-400 hover:text-slate-200 transition-all flex items-center gap-1";
+      } else {
+        btnGuild.className = "px-2.5 py-1 rounded text-xs font-semibold transition-all bg-gradient-to-r from-pink-500/20 to-indigo-600/30 text-pink-300 border border-pink-400/30 flex items-center gap-1";
+        btnSolo.className = "px-2.5 py-1 rounded text-xs font-semibold text-slate-400 hover:text-slate-200 transition-all";
+        switchTab('guild');
+      }
+    }
+
+    function switchTab(tabId) {
+      APP_STATE.activeTab = tabId;
+      const views = ['tavern', 'stars', 'forge', 'guild', 'oracle'];
+      views.forEach(v => {
+        const el = document.getElementById(`view-${v}`);
+        if (el) el.classList.toggle('hidden', v !== tabId);
+      });
+
+      // Update Bottom Bar active states
+      ['tavern', 'stars', 'guild', 'oracle'].forEach(nav => {
+        const btn = document.getElementById(`nav-${nav}`);
+        if (btn) {
+          if (nav === tabId) {
+            btn.classList.add('text-cyan-300');
+            btn.classList.remove('text-slate-400');
+          } else {
+            btn.classList.remove('text-cyan-300');
+            btn.classList.add('text-slate-400');
+          }
+        }
+      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function setForgeSubtab(sub) {
+      const quickPanel = document.getElementById('forge-quick-panel');
+      const importPanel = document.getElementById('forge-import-panel');
+      const tabQuick = document.getElementById('forge-tab-quick');
+      const tabImport = document.getElementById('forge-tab-import');
+
+      if (sub === 'quick') {
+        quickPanel.classList.remove('hidden');
+        importPanel.classList.add('hidden');
+        tabQuick.className = "flex-1 py-1.5 rounded text-xs font-bold bg-gradient-to-r from-cyan-500/30 to-indigo-600/40 text-cyan-300 border border-cyan-400/40";
+        tabImport.className = "flex-1 py-1.5 rounded text-xs font-semibold text-slate-400 hover:text-white";
+      } else {
+        quickPanel.classList.add('hidden');
+        importPanel.classList.remove('hidden');
+        tabImport.className = "flex-1 py-1.5 rounded text-xs font-bold bg-gradient-to-r from-pink-500/30 to-indigo-600/40 text-pink-300 border border-pink-400/40";
+        tabQuick.className = "flex-1 py-1.5 rounded text-xs font-semibold text-slate-400 hover:text-white";
+      }
+    }
+
+    function setTxMethod(method) {
+      APP_STATE.txMethod = method;
+      const btnCash = document.getElementById('btn-method-cash');
+      const btnCard = document.getElementById('btn-method-card');
+
+      if (method === 'CAIXA') {
+        btnCash.className = "py-2 px-3 rounded-lg border border-cyan-400/60 bg-cyan-950/40 text-cyan-300 text-xs font-bold text-left flex items-center justify-between";
+        btnCard.className = "py-2 px-3 rounded-lg border border-indigo-500/30 bg-[#121636] text-slate-400 text-xs font-semibold text-left flex items-center justify-between";
+      } else {
+        btnCard.className = "py-2 px-3 rounded-lg border border-pink-400/60 bg-pink-950/40 text-pink-300 text-xs font-bold text-left flex items-center justify-between";
+        btnCash.className = "py-2 px-3 rounded-lg border border-indigo-500/30 bg-[#121636] text-slate-400 text-xs font-semibold text-left flex items-center justify-between";
+      }
+    }
+
+    function setInstallments(n) {
+      APP_STATE.installments = n;
+      document.querySelectorAll('.inst-btn').forEach(b => {
+        b.className = "inst-btn py-1 rounded bg-[#151a3d] border border-indigo-500/30 text-xs text-slate-300";
+      });
+      event.target.className = "inst-btn py-1 rounded bg-indigo-600/40 border border-cyan-400 text-xs font-bold text-cyan-300";
+      
+      const preview = document.getElementById('installment-preview');
+      if (preview) {
+        preview.textContent = n === 1 ? '1x à vista na fatura' : `${n} parcelas mensais bloqueadas`;
+      }
+    }
+
+    function selectCategory(catName) {
+      APP_STATE.selectedCategory = catName;
+      document.querySelectorAll('.cat-btn').forEach(btn => {
+        btn.classList.remove('border-cyan-400', 'bg-indigo-950/70');
+        btn.classList.add('border-indigo-500/30', 'bg-[#121636]');
+      });
+      event.currentTarget.classList.add('border-cyan-400', 'bg-indigo-950/70');
+    }
+
+    function commitNewTransaction() {
+      const amtInput = document.getElementById('tx-amount');
+      const descInput = document.getElementById('tx-desc');
+      const tagsInput = document.getElementById('tx-tags');
+
+      const amount = parseFloat(amtInput.value);
+      if (!amount || amount <= 0) {
+        alert("Por favor, digite um valor válido maior que zero.");
+        return;
+      }
+
+      const desc = descInput.value.trim() || 'Lançamento Solstício';
+      const tag = tagsInput.value.trim() || '#Geral';
+
+      // Accounting Engine Rules:
+      // 1. Abate no teto da categoria imediatamente
+      const targetCat = APP_STATE.categories.find(c => c.id === APP_STATE.selectedCategory);
+      if (targetCat) {
+        targetCat.spent += amount;
+      }
+
+      // Add to recent txs
+      APP_STATE.transactions.unshift({
+        id: 'tx-' + Date.now(),
+        desc: desc,
+        amount: amount,
+        cat: APP_STATE.selectedCategory,
+        method: APP_STATE.txMethod,
+        date: 'Hoje',
+        tag: tag
+      });
+
+      // Reset inputs & celebrate XP
+      amtInput.value = '';
+      descInput.value = '';
+      tagsInput.value = '';
+      APP_STATE.user.xp += 20;
+
+      alert(`⚔️ Lançamento de R$ ${amount.toFixed(2)} registrado com sucesso! +20 XP de Sabedoria.`);
+      renderApp();
+      switchTab('tavern');
+    }
+
+    // --- 6. MODAL & EXPLAINER SYSTEM (3 BLOCOS) ---
+    let currentModalTarget = '';
+
+    function openExplainerModal(target) {
+      currentModalTarget = target;
+      const modal = document.getElementById('explainer-modal');
+      const title = document.getElementById('modal-title');
+      const desc = document.getElementById('modal-desc');
+      const status = document.getElementById('modal-current-status');
+
+      if (target === 'safe_spend') {
+        title.textContent = "Limite Seguro Diário";
+        desc.textContent = "Calcula quanto você pode gastar a cada dia restante do mês sem comprometer suas contas fixas, faturas e a meta de poupança.";
+        status.textContent = "Seu limite hoje é de R$ 84,50/dia. Você tem 16 dias restantes e está R$ 12/dia acima da média recomendada, o que é ótimo!";
+      } else if (target === 'break_even') {
+        title.textContent = "Ponto de Equilíbrio Mensal";
+        desc.textContent = "Mostra a soma das suas despesas essenciais mínimas (custos fixos + parcelas do cartão). Acima desta linha você entra na Zona Verde de Conquista.";
+        status.textContent = "Seu ponto de equilíbrio é R$ 4.200. Com sua renda líquida de R$ 6.500, você já conquistou R$ 2.300 de margem livre!";
+      } else if (target === 'reserve_shield') {
+        title.textContent = "Escudo de Reserva";
+        desc.textContent = "Representa quantos meses de custo essencial seu saldo de reserva cobre caso nenhuma nova receita entre.";
+        status.textContent = "Você possui 4.2 meses de tranquilidade garantidos no cofre (R$ 21.000). A meta recomendada de 6 meses será alcançada em Fevereiro.";
+      } else if (target === 'burn_rate') {
+        title.textContent = "Ritmo de Gasto (Burn Rate)";
+        desc.textContent = "Compara a porcentagem de dias já decorridos no mês com a porcentagem do orçamento consumido.";
+        status.textContent = "Atenção em Alimentação: dia 15 (50% do mês), mas 82% do teto já foi gasto. Nesse ritmo, o teto acabará no dia 22.";
+      } else {
+        title.textContent = "Teto de Categoria";
+        desc.textContent = "O limite estipulado baseado na sua classe financeira para manter o equilíbrio orçamentário.";
+        status.textContent = "O marcador vertical ciano indica o dia 15 (metade do mês). Se a barra colorida ultrapassar a linha vertical, você está gastando mais rápido que o tempo.";
+      }
+
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeExplainerModal() {
+      const modal = document.getElementById('explainer-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function askOracleFromModal() {
+      closeExplainerModal();
+      switchTab('oracle');
+      const input = document.getElementById('oracle-input');
+      input.value = `Oráculo, me ajude a entender melhor e otimizar: ${currentModalTarget}`;
+      sendOracleMessage();
+    }
+
+    // --- 7. ORÁCULO CHAT ENGINE (Real-Time State Reactive) ---
+    function sendOracleMessage() {
+      const input = document.getElementById('oracle-input');
+      const text = input.value.trim();
+      if (!text) return;
+
+      appendChatMessage('user', text);
+      input.value = '';
+
+      // Generate intelligent contextual response
+      setTimeout(() => {
+        generateOracleResponse(text);
+      }, 500);
+    }
+
+    function handleOracleKey(e) {
+      if (e.key === 'Enter') sendOracleMessage();
+    }
+
+    function appendChatMessage(sender, text) {
+      const log = document.getElementById('oracle-chat-log');
+      const isUser = sender === 'user';
+
+      const msgDiv = document.createElement('div');
+      msgDiv.className = `flex items-start gap-2 ${isUser ? 'justify-end' : ''}`;
+      msgDiv.innerHTML = `
+        ${!isUser ? '<div class="w-6 h-6 rounded bg-indigo-900 flex items-center justify-center text-xs flex-shrink-0">🔮</div>' : ''}
+        <div class="${isUser ? 'bg-indigo-600 text-white' : 'bg-[#1b2047] text-slate-200 border border-indigo-500/30'} p-2.5 rounded-lg max-w-[85%] leading-relaxed text-xs">
+          ${text}
+        </div>
+        ${isUser ? '<div class="w-6 h-6 rounded bg-cyan-700 flex items-center justify-center text-xs flex-shrink-0">🧙‍♂️</div>' : ''}
+      `;
+      log.appendChild(msgDiv);
+      log.scrollTop = log.scrollHeight;
+    }
+
+    function generateOracleResponse(query) {
+      const lower = query.toLowerCase();
+      let response = "";
+
+      if (lower.includes('jogo') || lower.includes('250')) {
+        response = `
+          <strong>Análise de Compra (Simulação do Oráculo):</strong><br>
+          Se comprar o jogo de <strong>R$ 250</strong> no crédito à vista, seu Limite Seguro Diário cairá de R$ 84,50 para <strong>R$ 68,80</strong> pelos próximos 16 dias.<br><br>
+          <span class="text-emerald-300">✓ Veredito: Aprovado!</span> Seu Ponto de Equilíbrio continuará intacto. Recomendo encaixar na tag <em>#Lazer</em>.
+        `;
+      } else if (lower.includes('poupar') || lower.includes('1.500') || lower.includes('300')) {
+        response = `
+          <strong>Estratégia dos Astros para Poupança:</strong><br>
+          Seu maior vazamento atual é em <strong>Alimentação</strong> (82% consumido). Remanejando <strong>R$ 15/dia</strong> de delivery para refeições preparadas em casa, você acumula exatamente <strong>R$ 240 extras</strong> até o dia 30, garantindo o fechamento acima de R$ 1.380!
+        `;
+      } else {
+        response = `
+          Baseado no seu inventário atual: sua renda líquida é de R$ 6.500, com R$ 2.400 em custos fixos e R$ 21.000 no <strong>Escudo de Reserva</strong> (4.2 meses). Seu ritmo geral está saudável, com folga diária de R$ 84,50.
+        `;
+      }
+
+      appendChatMessage('oracle', response);
+    }
+
+    function quickPromptOracle(text) {
+      document.getElementById('oracle-input').value = text;
+      sendOracleMessage();
+    }
+
+    function resetOracleChat() {
+      const log = document.getElementById('oracle-chat-log');
+      log.innerHTML = `
+        <div class="flex items-start gap-2">
+          <div class="w-6 h-6 rounded bg-indigo-900 flex items-center justify-center text-xs flex-shrink-0">🔮</div>
+          <div class="bg-[#1b2047] p-2.5 rounded-lg border border-indigo-500/30 text-slate-200 max-w-[88%] leading-relaxed text-xs">
+            Oráculo reiniciado. O que deseja consultar no livro contábil?
+          </div>
+        </div>
+      `;
+    }
+
+    // --- 8. GUILD & OFX DEMO ACTIONS ---
+    function executeGuildSettlement() {
+      alert("✓ Transferência neutra de ACERTO_GUILDA de R$ 300,00 registrada com sucesso! Saldos equilibrados sem alterar receitas ou despesas.");
+    }
+
+    function loadMockOFX() {
+      alert("Arquivo 'extrato_outubro_nubank.ofx' lido com sucesso! 3 novas transações encontradas, 0 duplicadas e 1 transferência interna identificada.");
+    }
+
+    function confirmImportBatch() {
+      alert("Lançamentos importados com sucesso para suas respectivas categorias contábeis (+60 XP).");
+      switchTab('tavern');
+    }
+
+    function filterByTag(tag) {
+      const summary = document.getElementById('tag-filtered-summary');
+      if (tag === 'ViagemFerias') {
+        summary.innerHTML = "<strong>#ViagemFérias:</strong> Total acumulado de <strong>R$ 1.840,00</strong> em 6 lançamentos (Passagens, Hospedagem e Taxas).";
+      } else if (tag === 'Reforma') {
+        summary.innerHTML = "<strong>#Reforma:</strong> Total acumulado de <strong>R$ 920,00</strong> em 3 lançamentos (Materiais de Pintura e Iluminação).";
+      } else if (tag === 'Pet') {
+        summary.innerHTML = "<strong>#Pet:</strong> Total acumulado de <strong>R$ 380,00</strong> (Veterinário e Ração).";
+      } else {
+        summary.innerHTML = "Mostrando visão global de todos os projetos transversais cadastrados.";
+      }
+    }
+
+    function acceptMissionPrompt() {
+      alert("⚔️ Missão 'O Cerco do Delivery Noturno' aceita! Segure os gastos hoje e ganhe +40 XP ao fechar o dia.");
+    }
+
+    function askOracleAboutMission() {
+      switchTab('oracle');
+      quickPromptOracle("Como economizar em Alimentação nos próximos 3 dias?");
+    }
+
+    // Initialize application on load
+    window.addEventListener('DOMContentLoaded', () => {
+      renderApp();
+    });
+  </script>
+
+
+</body></html>
+
+<!-- Forja de Lançamentos - Simulador RPG 32-Bit -->
+<!DOCTYPE html>
+
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Solstice Ledger — Forja &amp; Simulador 32-Bit</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            cinzel: ['"Cinzel"', 'serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            rpg32: {
+              bg: '#080d1a',
+              window: '#0e172a',
+              windowDeep: '#070b14',
+              frame: '#1e293b',
+              frameGlow: '#38bdf8',
+              borderCyan: 'rgba(56, 189, 248, 0.45)',
+              gold: '#f6d860',
+              ruby: '#ef4444',
+              mana: '#38bdf8',
+              violet: '#a855f7',
+              emerald: '#10b981'
+            }
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    /* Classic 32-Bit PS1/Saturn Window Gradients & Metallic Bevels */
+    .psx-window {
+      background: linear-gradient(180deg, #131d38 0%, #0d1428 55%, #080d1c 100%);
+      border: 1.5px solid rgba(56, 189, 248, 0.4);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.75), 
+                  inset 0 1px 0 rgba(255, 255, 255, 0.22),
+                  inset 0 -1px 0 rgba(0, 0, 0, 0.8),
+                  0 0 16px rgba(56, 189, 248, 0.12);
+      position: relative;
+    }
+
+    .psx-window::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent 0%, rgba(125, 211, 252, 0.8) 50%, transparent 100%);
+      pointer-events: none;
+    }
+
+    .psx-window-danger {
+      background: linear-gradient(180deg, #24111d 0%, #170912 60%, #0e050b 100%);
+      border: 1.5px solid rgba(239, 68, 68, 0.55);
+      box-shadow: 0 8px 24px rgba(220, 38, 38, 0.2), 
+                  inset 0 1px 0 rgba(254, 202, 202, 0.25),
+                  0 0 18px rgba(239, 68, 68, 0.15);
+      position: relative;
+    }
+
+    .psx-bevel-button {
+      background: linear-gradient(180deg, #22345e 0%, #152240 60%, #0c1428 100%);
+      border: 1px solid rgba(125, 211, 252, 0.5);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 
+                  0 3px 6px rgba(0,0,0,0.4);
+    }
+    .psx-bevel-button:active {
+      transform: translateY(1px);
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.6);
+    }
+
+    .psx-cyan-gem {
+      background: linear-gradient(180deg, #38bdf8 0%, #0284c7 60%, #0369a1 100%);
+      box-shadow: 0 4px 14px rgba(56, 189, 248, 0.4), 
+                  inset 0 1px 1px rgba(255, 255, 255, 0.6),
+                  inset 0 -1px 2px rgba(0,0,0,0.5);
+    }
+
+    .psx-corner-bracket::before, .psx-corner-bracket::after {
+      content: '';
+      position: absolute;
+      width: 7px;
+      height: 7px;
+      border-color: #38bdf8;
+      pointer-events: none;
+    }
+    .psx-corner-bracket::before {
+      top: -1px; left: -1px;
+      border-top: 2px solid #38bdf8;
+      border-left: 2px solid #38bdf8;
+    }
+    .psx-corner-bracket::after {
+      bottom: -1px; right: -1px;
+      border-bottom: 2px solid #38bdf8;
+      border-right: 2px solid #38bdf8;
+    }
+
+    /* Subdued scanlines reminiscent of classic 32-bit CRT / Sony Trinitron */
+    .scanlines-overlay {
+      background: linear-gradient(rgba(18, 24, 38, 0) 50%, rgba(3, 7, 18, 0.28) 50%);
+      background-size: 100% 3px;
+    }
+
+    /* ATB Bar Shimmer */
+    .atb-bar {
+      background: linear-gradient(90deg, #ef4444 0%, #f43f5e 40%, #fb7185 100%);
+      box-shadow: 0 0 10px rgba(244, 63, 94, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.4);
+    }
+  </style>
+<meta content="mobile_tab" name="shell-type"/></head>
+<body class="bg-[#050811] text-slate-100 font-sans min-h-screen antialiased selection:bg-cyan-500 selection:text-black pb-28">
+<!-- Scanline & Ambient Cosmic Vignette Layer -->
+<div class="fixed inset-0 scanlines-overlay pointer-events-none z-30 opacity-70"></div>
+<!-- Mobile Frame Container (PlayStation / Saturn Visual Masterpiece) -->
+<div class="max-w-md mx-auto min-h-screen bg-gradient-to-b from-[#070b16] via-[#0d1428] to-[#120f26] relative flex flex-col shadow-2xl border-x border-cyan-950/40" id="app">
+<!-- ================= 1. HEADER & TOPO 32-BIT SOLSTICE ================= -->
+<header class="sticky top-0 z-40 bg-[#091124]/95 backdrop-blur-md border-b border-cyan-500/30 px-3.5 py-2.5 shadow-lg">
+<div class="flex items-center justify-between gap-2 mb-2">
+<!-- Solstice Crest & Status -->
+<div class="flex items-center gap-2.5">
+<div class="relative w-9 h-9 rounded-md bg-gradient-to-tr from-cyan-600 via-indigo-600 to-fuchsia-500 p-[1.5px] shadow-[0_0_12px_rgba(56,189,248,0.4)]">
+<div class="w-full h-full bg-[#0a1122] rounded-sm flex items-center justify-center relative overflow-hidden">
+<span class="material-symbols-outlined text-cyan-300 text-lg">auto_awesome</span>
+<div class="absolute inset-0 bg-gradient-to-t from-transparent via-cyan-400/20 to-transparent"></div>
+</div>
+</div>
+<div>
+<div class="flex items-center gap-1.5">
+<span class="font-cinzel font-bold text-xs tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-cyan-200 via-sky-300 to-indigo-200">SOLSTICE</span>
+<span class="text-[9px] font-mono font-bold px-1.5 py-0.2 rounded bg-gradient-to-r from-amber-500/20 to-yellow-500/10 border border-amber-400/50 text-amber-300 tracking-wider shadow-[0_0_8px_rgba(251,191,36,0.3)] animate-pulse">32-BIT</span>
+</div>
+<p class="text-[10px] text-cyan-200/80 font-medium flex items-center gap-1">
+<span>Guardião da Luz</span>
+<span class="w-1 h-1 rounded-full bg-cyan-400"></span>
+<span class="text-amber-300 font-mono font-semibold">Nv. 14</span>
+</p>
+</div>
+</div>
+<!-- Mode Toggle: Solo vs Guilda (32-Bit Bevel Switch) -->
+<div class="flex items-center bg-[#070d1d] p-0.5 rounded-md border border-cyan-500/40 shadow-inner">
+<button class="px-2.5 py-1 rounded text-xs font-semibold bg-gradient-to-r from-cyan-500/25 to-sky-600/35 text-cyan-300 border border-cyan-400/40 shadow-sm" id="btn-mode-solo">
+        Solo
+      </button>
+<button class="px-2.5 py-1 rounded text-xs font-semibold text-slate-400 hover:text-slate-200 flex items-center gap-1 transition-all" id="btn-mode-guild">
+<span>Guilda</span>
+<span class="w-1.5 h-1.5 rounded-full bg-fuchsia-400 shadow-[0_0_6px_#f472b6]"></span>
+</button>
+</div>
+</div>
+<!-- Language Tier Selector (1. Fácil | 2. Médio | 3. RPG 32-Bit Ativo) -->
+<div class="flex items-center justify-between gap-1.5 bg-[#060a17] p-1 rounded-md border border-cyan-500/20 text-[11px]">
+<div class="text-[9px] font-mono text-cyan-400/90 pl-1 uppercase tracking-wider flex items-center gap-1 font-semibold">
+<span class="material-symbols-outlined text-[13px] text-cyan-400">translate</span>
+      Tom:
+    </div>
+<div class="flex gap-1 flex-1 justify-end font-mono">
+<button class="px-2 py-0.5 rounded text-[10px] text-slate-400 hover:text-white transition-all">
+        1. Fácil
+      </button>
+<button class="px-2 py-0.5 rounded text-[10px] text-slate-400 hover:text-white transition-all">
+        2. Médio
+      </button>
+<button class="px-2 py-0.5 rounded text-[10px] font-bold bg-gradient-to-r from-cyan-600/60 to-indigo-600/70 text-cyan-200 border border-cyan-400/60 shadow-[0_0_8px_rgba(56,189,248,0.35)]">
+        3. RPG 32-Bit
+      </button>
+</div>
+</div>
+</header>
+<!-- ================= CONTENT VIEWS: FORJA & SIMULADOR ================= -->
+<main class="flex-1 px-3.5 py-3.5 space-y-4">
+<!-- CONTEXT HEADER: FORJA DE LANÇAMENTOS -->
+<div class="space-y-2.5">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="text-cyan-400 material-symbols-outlined text-base">hardware</span>
+<span class="font-mono text-xs tracking-wider text-cyan-300 font-bold uppercase">FORJA // SIMULADOR ASTRAL</span>
+</div>
+<div class="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-cyan-950/70 border border-cyan-400/40 text-cyan-300 font-mono text-[10px] shadow-[0_0_10px_rgba(56,189,248,0.2)]">
+<span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping"></span>
+<span class="font-semibold tracking-wide">MODAL ATIVO: SIMULAÇÃO</span>
+</div>
+</div>
+<!-- TABS DE MODO DA FORJA (32-BIT TABS) -->
+<div class="grid grid-cols-3 gap-1.5 p-1 bg-[#070c1a] rounded-lg border border-cyan-950/70">
+<button class="py-1.5 px-1 rounded text-center font-sans text-[11px] font-semibold text-slate-400 hover:text-cyan-200 hover:bg-slate-800/40 transition-all" type="button">
+        Lançamento Rápido
+      </button>
+<button class="py-1.5 px-1 rounded text-center font-sans font-bold text-[11px] bg-gradient-to-r from-cyan-500/25 via-indigo-600/40 to-cyan-500/25 text-cyan-300 border border-cyan-400/50 shadow-[0_0_12px_rgba(56,189,248,0.25)] relative overflow-hidden" type="button">
+<span class="relative z-10 flex items-center justify-center gap-1">
+<span class="text-cyan-300">✦</span> Simulador Parcelado
+        </span>
+<div class="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-400/10 to-transparent"></div>
+</button>
+<button class="py-1.5 px-1 rounded text-center font-sans text-[11px] font-semibold text-slate-400 hover:text-cyan-200 hover:bg-slate-800/40 transition-all" type="button">
+        Importar OFX/CSV
+      </button>
+</div>
+</div>
+<!-- ================= 2. JANELA DE MENU 32-BIT COM CHANFROS LUMINOSOS ================= -->
+<div class="psx-window psx-corner-bracket rounded-xl p-4 space-y-4">
+<!-- Top Dialogue Title Bar with Celestial Glyphs & Bevel Line -->
+<div class="flex items-center justify-between pb-2.5 border-b border-cyan-500/30 -mx-1 px-1">
+<div class="flex items-center gap-2.5">
+<div class="w-7 h-7 rounded bg-gradient-to-br from-indigo-700 to-slate-900 border border-cyan-400/40 flex items-center justify-center text-cyan-300 shadow-[0_0_10px_rgba(56,189,248,0.3)]">
+<span class="material-symbols-outlined text-sm">credit_card_clock</span>
+</div>
+<div>
+<h2 class="font-cinzel font-bold text-sm tracking-wide text-cyan-100 leading-tight">Simular Compra no Cartão</h2>
+<p class="font-mono text-[10px] text-cyan-400/70">Análise preditiva de comprometimento futuro</p>
+</div>
+</div>
+<div class="flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_6px_#38bdf8]"></span>
+<span class="text-cyan-300 font-mono font-bold text-[10px] tracking-widest">◆ 32-BIT ◆</span>
+</div>
+</div>
+<!-- ================= 3. FORMULÁRIO DE SIMULAÇÃO INTUITIVO ================= -->
+<div class="space-y-3.5 bg-[#091024]/85 border border-cyan-900/60 p-3 rounded-lg shadow-inner">
+<!-- LINHA 1: DESCRIÇÃO DO ESPÓLIO -->
+<div class="space-y-1">
+<label class="block font-mono text-[10.5px] text-cyan-300/80 uppercase tracking-wider font-semibold">Item / Descrição do Espólio</label>
+<div class="relative flex items-center">
+<input class="w-full bg-[#070b18] border border-cyan-500/30 text-slate-100 font-sans text-xs py-2 pl-3 pr-24 rounded focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 shadow-inner" id="sim-desc" placeholder="Nome do item..." type="text" value="Espada Cósmica Lendária / Setup Workstation Pro"/>
+<span class="absolute right-2 px-2 py-0.5 rounded font-mono text-[10px] font-bold bg-fuchsia-950/80 border border-fuchsia-400/40 text-fuchsia-300 shadow-sm">#Trabalho</span>
+</div>
+</div>
+<!-- LINHA 2: CATEGORIA (RECIPIENTE DE MANA) -->
+<div class="space-y-1.5">
+<label class="block font-mono text-[10.5px] text-cyan-300/80 uppercase tracking-wider font-semibold">Recipiente de Mana (Categoria)</label>
+<div class="grid grid-cols-3 gap-1.5 text-center font-sans">
+<!-- Equipamento (Ativo) -->
+<div class="p-2 rounded bg-gradient-to-b from-cyan-500/25 to-indigo-950/70 border border-cyan-400/70 text-cyan-200 shadow-[0_0_12px_rgba(56,189,248,0.25)] cursor-pointer flex items-center justify-center gap-1.5">
+<span class="material-symbols-outlined text-sm text-cyan-300">handyman</span>
+<span class="font-bold text-[11px]">Equipamento</span>
+</div>
+<!-- Lazer -->
+<div class="p-2 rounded bg-[#091124] border border-slate-700/50 text-slate-400 hover:text-slate-200 hover:border-slate-500 transition-all cursor-pointer flex items-center justify-center gap-1.5">
+<span class="material-symbols-outlined text-sm">sports_esports</span>
+<span class="font-medium text-[11px]">Lazer</span>
+</div>
+<!-- Ofício -->
+<div class="p-2 rounded bg-[#091124] border border-slate-700/50 text-slate-400 hover:text-slate-200 hover:border-slate-500 transition-all cursor-pointer flex items-center justify-center gap-1.5">
+<span class="material-symbols-outlined text-sm">work</span>
+<span class="font-medium text-[11px]">Ofício</span>
+</div>
+</div>
+</div>
+<!-- LINHA 3: PREÇO & GRIMÓRIO DE PAGAMENTO -->
+<div class="grid grid-cols-2 gap-2.5">
+<div class="space-y-1">
+<label class="block font-mono text-[10.5px] text-cyan-300/80 uppercase tracking-wider font-semibold">Preço em Moedas</label>
+<div class="relative">
+<input class="w-full bg-[#070b18] border border-cyan-500/30 text-amber-300 font-mono font-bold text-sm py-1.5 px-2.5 rounded shadow-inner text-right focus:outline-none focus:border-amber-400" id="sim-total-amount" type="text" value="7.200,00"/>
+<span class="absolute left-2.5 top-2 font-mono text-[11px] text-cyan-400/80 font-bold">R$</span>
+</div>
+</div>
+<div class="space-y-1">
+<label class="block font-mono text-[10.5px] text-cyan-300/80 uppercase tracking-wider font-semibold">Grimório de Pagamento</label>
+<div class="bg-[#070b18] border border-cyan-500/30 p-0.5 rounded flex items-center h-[34px]">
+<button class="flex-1 h-full rounded font-mono text-[10px] font-bold bg-gradient-to-r from-fuchsia-600/40 to-indigo-600/50 border border-fuchsia-400/60 text-fuchsia-200 shadow-sm flex items-center justify-center gap-1" type="button">
+<span class="material-symbols-outlined text-xs">credit_card</span> Cartão Astral
+            </button>
+<button class="flex-1 h-full rounded font-mono text-[10px] text-slate-400 hover:text-white flex items-center justify-center gap-1 transition-all" type="button">
+<span class="material-symbols-outlined text-xs">bolt</span> Pix Imediato
+            </button>
+</div>
+</div>
+</div>
+<!-- LINHA 4: SELETOR DE PARCELAS EM BOTÕES 32-BIT -->
+<div class="space-y-1.5 pt-0.5">
+<div class="flex justify-between items-center font-mono">
+<span class="text-[10.5px] text-cyan-300/80 uppercase tracking-wider font-semibold">Divisão de Faturas</span>
+<span class="text-[11px] text-rose-400 font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">schedule</span> 12x de R$ 600,00 (sem juros)
+          </span>
+</div>
+<div class="grid grid-cols-5 gap-1.5 font-mono text-xs">
+<button class="py-1.5 rounded bg-[#091124] border border-slate-700/60 text-slate-400 hover:text-white hover:border-slate-500 transition-all font-semibold" type="button">1x</button>
+<button class="py-1.5 rounded bg-[#091124] border border-slate-700/60 text-slate-400 hover:text-white hover:border-slate-500 transition-all font-semibold" type="button">3x</button>
+<button class="py-1.5 rounded bg-[#091124] border border-slate-700/60 text-slate-400 hover:text-white hover:border-slate-500 transition-all font-semibold" type="button">6x</button>
+<button class="py-1.5 rounded bg-[#091124] border border-slate-700/60 text-slate-400 hover:text-white hover:border-slate-500 transition-all font-semibold" type="button">10x</button>
+<button class="py-1.5 rounded bg-gradient-to-b from-rose-600 via-rose-700 to-red-900 text-white font-bold border border-rose-400/80 shadow-[0_0_12px_rgba(244,63,94,0.45)] relative overflow-hidden" type="button">
+<span class="relative z-10">12x</span>
+<div class="absolute inset-0 bg-white/15 mix-blend-overlay"></div>
+</button>
+</div>
+<div class="flex items-center justify-between text-[10px] font-mono text-slate-400 pt-0.5">
+<span>Primeiro vencimento: <strong class="text-cyan-200">10 de Novembro</strong></span>
+<span class="text-rose-400 font-semibold">Término: Out/2026 (12 Luas)</span>
+</div>
+</div>
+</div>
+<!-- ================= 4. PAINEL DE ANÁLISE PREDITIVA & RESSONÂNCIA TEMPORAL ================= -->
+<div class="psx-window-danger rounded-xl p-3.5 space-y-3.5 border border-rose-500/50 shadow-xl">
+<!-- Top Alert Bar -->
+<div class="flex items-center justify-between border-b border-rose-500/30 pb-2">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded bg-rose-950/80 border border-rose-400/60 flex items-center justify-center text-rose-400 shadow-[0_0_8px_rgba(244,63,94,0.4)]">
+<span class="material-symbols-outlined text-sm animate-pulse">warning</span>
+</div>
+<span class="font-cinzel text-xs text-rose-200 tracking-wider uppercase font-bold">Cálculo de Ressonância Temporal</span>
+</div>
+<span class="px-2.5 py-0.5 rounded-full font-mono text-[9.5px] bg-rose-900/90 border border-rose-400 text-rose-100 font-bold tracking-wider animate-pulse shadow-[0_0_10px_rgba(239,68,68,0.5)] flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-rose-300"></span>
+          ⚠️ RISCO CRÍTICO (&gt;50%)
+        </span>
+</div>
+<!-- Métricas Comparativas de Impacto -->
+<div class="grid grid-cols-2 gap-2.5">
+<!-- Comprometimento de Renda -->
+<div class="bg-[#0b050d]/80 p-2.5 rounded-lg border border-rose-500/40 space-y-1 shadow-inner">
+<span class="font-mono text-[9.5px] text-rose-300/80 block uppercase tracking-wide">Comprometimento de Renda</span>
+<div class="flex items-baseline gap-1.5">
+<span class="font-mono text-xs text-slate-400">38.0%</span>
+<span class="material-symbols-outlined text-xs text-rose-400">trending_up</span>
+<span class="font-mono text-sm text-rose-300 font-extrabold">54.2%</span>
+</div>
+<div class="flex items-center gap-1 font-mono text-[9px] text-rose-400 font-bold">
+<span class="w-1.5 h-1.5 rounded-full bg-rose-500 shadow-[0_0_4px_#ef4444]"></span>
+<span>Teto Sagrado Rompido (&gt;50%)</span>
+</div>
+</div>
+<!-- Fatura de Novembro -->
+<div class="bg-[#0b050d]/80 p-2.5 rounded-lg border border-rose-500/30 space-y-1 shadow-inner">
+<span class="font-mono text-[9.5px] text-rose-300/80 block uppercase tracking-wide">Fatura de Novembro</span>
+<div class="flex items-baseline gap-1.5">
+<span class="font-mono text-xs text-slate-400 line-through">R$ 820</span>
+<span class="material-symbols-outlined text-xs text-rose-400">arrow_forward</span>
+<span class="font-mono text-sm text-rose-300 font-extrabold">R$ 1.420</span>
+</div>
+<span class="font-mono text-[9px] text-rose-400 font-semibold block leading-tight">+R$ 600,00 da nova obrigação</span>
+</div>
+<!-- Safe-to-Spend Diário -->
+<div class="bg-[#0b050d]/80 p-2.5 rounded-lg border border-rose-500/30 space-y-1 shadow-inner">
+<span class="font-mono text-[9.5px] text-rose-300/80 block uppercase tracking-wide">Safe-to-Spend Diário</span>
+<div class="flex items-baseline gap-1.5">
+<span class="font-mono text-xs text-slate-400">R$ 85/dia</span>
+<span class="material-symbols-outlined text-xs text-rose-400">trending_down</span>
+<span class="font-mono text-sm text-rose-300 font-extrabold">R$ 52/dia</span>
+</div>
+<span class="font-mono text-[9px] text-rose-400 font-semibold block leading-tight">-R$ 33/dia (Sufocamento de Mana)</span>
+</div>
+<!-- Duração do Feitiço -->
+<div class="bg-[#0b050d]/80 p-2.5 rounded-lg border border-rose-500/30 space-y-1 shadow-inner">
+<span class="font-mono text-[9.5px] text-rose-300/80 block uppercase tracking-wide">Duração do Feitiço</span>
+<div class="flex items-baseline gap-1.5">
+<span class="font-mono text-sm text-rose-300 font-extrabold">12 Luas</span>
+<span class="font-mono text-[10px] text-slate-400">consecutivas</span>
+</div>
+<span class="font-mono text-[9px] text-rose-400 block leading-tight font-medium">Aprisionamento Contínuo</span>
+</div>
+</div>
+<!-- Gráfico de Horizonte (Horizon Chart 32-Bit com Barras Contínuas) -->
+<div class="space-y-1.5 bg-[#09040a]/90 p-3 rounded-lg border border-rose-500/25 shadow-inner">
+<div class="flex justify-between items-center font-mono text-[10.5px]">
+<span class="text-rose-300 font-bold flex items-center gap-1.5">
+<span class="material-symbols-outlined text-xs text-rose-400">bar_chart</span>
+            Horizonte de Faturas (6 Luas)
+          </span>
+<div class="flex items-center gap-2 text-[9px]">
+<span class="flex items-center gap-1 text-slate-400">
+<span class="w-2 h-2 rounded-sm bg-indigo-900 border border-indigo-700"></span> Atual
+            </span>
+<span class="flex items-center gap-1 text-rose-400 font-bold">
+<span class="w-2 h-2 rounded-sm bg-rose-500 border border-rose-300 shadow-[0_0_4px_#ef4444]"></span> +R$ 600
+            </span>
+</div>
+</div>
+<!-- Visual Horizon SVG Bar Chart (ATB Specular Glow Style) -->
+<div class="w-full pt-1">
+<svg class="w-full h-20 overflow-visible" fill="none" viewbox="0 0 350 82" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<lineargradient id="barBaseGrad" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#3b4266"></stop>
+<stop offset="100%" stop-color="#181d33"></stop>
+</lineargradient>
+<lineargradient id="barHazardGrad" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#fb7185"></stop>
+<stop offset="50%" stop-color="#e11d48"></stop>
+<stop offset="100%" stop-color="#9f1239"></stop>
+</lineargradient>
+<filter height="140%" id="hazardGlow" width="140%" x="-20%" y="-20%">
+<fedropshadow dx="0" dy="0" flood-color="#f43f5e" flood-opacity="0.6" stddeviation="2"></fedropshadow>
+</filter>
+</defs>
+<!-- Teto Prudente R$ 1.200 Linha Tracejada -->
+<line stroke="#f43f5e" stroke-dasharray="3 3" stroke-width="1.5" x1="4" x2="346" y1="18" y2="18"></line>
+<text class="fill-rose-400 font-mono text-[8px] font-bold" text-anchor="end" x="346" y="13">⚠️ TETO PRUDENTE R$ 1.200 (ESTOURADO)</text>
+<!-- Mês 1: Nov (Total 1.420 -> Estourado) -->
+<rect fill="url(#barBaseGrad)" height="28" rx="2" width="38" x="10" y="44"></rect>
+<rect fill="url(#barHazardGrad)" filter="url(#hazardGlow)" height="26" rx="2" width="38" x="10" y="18"></rect>
+<text class="fill-slate-400 font-mono text-[8.5px]" text-anchor="middle" x="29" y="78">Nov</text>
+<text class="fill-rose-300 font-mono text-[8px] font-extrabold" text-anchor="middle" x="29" y="14">1.420</text>
+<!-- Mês 2: Dez (Total 1.540 -> Pico de Fim de Ano) -->
+<rect fill="url(#barBaseGrad)" height="32" rx="2" width="38" x="68" y="40"></rect>
+<rect fill="url(#barHazardGrad)" filter="url(#hazardGlow)" height="26" rx="2" width="38" x="68" y="14"></rect>
+<text class="fill-slate-400 font-mono text-[8.5px]" text-anchor="middle" x="87" y="78">Dez</text>
+<text class="fill-rose-300 font-mono text-[8px] font-extrabold" text-anchor="middle" x="87" y="10">1.540</text>
+<!-- Mês 3: Jan (Total 1.350) -->
+<rect fill="url(#barBaseGrad)" height="25" rx="2" width="38" x="126" y="47"></rect>
+<rect fill="url(#barHazardGrad)" filter="url(#hazardGlow)" height="26" rx="2" width="38" x="126" y="21"></rect>
+<text class="fill-slate-400 font-mono text-[8.5px]" text-anchor="middle" x="145" y="78">Jan</text>
+<text class="fill-rose-300 font-mono text-[8px] font-extrabold" text-anchor="middle" x="145" y="17">1.350</text>
+<!-- Mês 4: Fev (Total 1.200 -> No Limite) -->
+<rect fill="url(#barBaseGrad)" height="20" rx="2" width="38" x="184" y="52"></rect>
+<rect fill="url(#barHazardGrad)" filter="url(#hazardGlow)" height="26" rx="2" width="38" x="184" y="26"></rect>
+<text class="fill-slate-400 font-mono text-[8.5px]" text-anchor="middle" x="203" y="78">Fev</text>
+<text class="fill-rose-300 font-mono text-[8px] font-bold" text-anchor="middle" x="203" y="22">1.200</text>
+<!-- Mês 5: Mar (Total 1.110 -> Dentro) -->
+<rect fill="url(#barBaseGrad)" height="17" rx="2" width="38" x="242" y="55"></rect>
+<rect fill="url(#barHazardGrad)" height="26" rx="2" width="38" x="242" y="29"></rect>
+<text class="fill-slate-400 font-mono text-[8.5px]" text-anchor="middle" x="261" y="78">Mar</text>
+<text class="fill-cyan-200 font-mono text-[8px] font-medium" text-anchor="middle" x="261" y="25">1.110</text>
+<!-- Mês 6: Abr (Total 1.020 -> Dentro) -->
+<rect fill="url(#barBaseGrad)" height="14" rx="2" width="38" x="300" y="58"></rect>
+<rect fill="url(#barHazardGrad)" height="26" rx="2" width="38" x="300" y="32"></rect>
+<text class="fill-slate-400 font-mono text-[8.5px]" text-anchor="middle" x="319" y="78">Abr</text>
+<text class="fill-cyan-200 font-mono text-[8px] font-medium" text-anchor="middle" x="319" y="28">1.020</text>
+</svg>
+</div>
+</div>
+<!-- ================= 5. VEREDITO DO ORÁCULO & STORYTELLING EM 3 PASSOS ================= -->
+<div class="space-y-2 pt-1">
+<div class="p-3 rounded-lg bg-[#0e0612]/90 border border-rose-500/40 space-y-2.5">
+<!-- Passo 1: Contexto -->
+<div class="flex items-start gap-2">
+<span class="w-4 h-4 rounded bg-rose-900 border border-rose-500 text-rose-200 font-mono text-[10px] font-bold flex items-center justify-center mt-0.5 flex-shrink-0">1</span>
+<p class="font-sans text-[11px] text-slate-300 leading-snug">
+<strong class="text-rose-300 font-semibold font-mono">Contexto:</strong> Seu comprometimento com faturas salta para <strong class="text-rose-400 font-mono font-bold">54.2%</strong>, quebrando o teto sagrado de 50% instituído pelo conselho da guilda.
+            </p>
+</div>
+<!-- Passo 2: Tensão -->
+<div class="flex items-start gap-2">
+<span class="w-4 h-4 rounded bg-rose-950 border border-rose-700 text-rose-300 font-mono text-[10px] font-bold flex items-center justify-center mt-0.5 flex-shrink-0">2</span>
+<p class="font-sans text-[11px] text-slate-300 leading-snug">
+<strong class="text-rose-300 font-semibold font-mono">Tensão:</strong> Aprisiona <strong class="text-cyan-200 font-mono font-semibold">R$ 600,00</strong> todos os meses durante 1 ano inteiro, comprimindo o Safe-to-Spend para <strong class="text-rose-400 font-mono font-bold">R$ 52/dia</strong> e reduzindo seu fôlego para emergências.
+            </p>
+</div>
+<!-- Passo 3: Veredito e Ação Recomendada -->
+<div class="flex items-start gap-2.5 p-2.5 rounded bg-rose-950/70 border border-rose-400/50 shadow-[0_0_12px_rgba(244,63,94,0.25)]">
+<div class="w-7 h-7 rounded-full bg-gradient-to-tr from-fuchsia-600 to-rose-600 border border-rose-300 flex items-center justify-center text-white flex-shrink-0 shadow-[0_0_8px_#f43f5e]">
+<span class="material-symbols-outlined text-sm">shield_with_heart</span>
+</div>
+<div class="space-y-1">
+<span class="block font-cinzel text-xs font-bold text-rose-200 tracking-wide">⛔ ALERTA DO ORÁCULO: Compra Desaconselhada!</span>
+<p class="font-sans text-[11px] text-rose-100/90 leading-relaxed">
+                Risco severo de aprisionamento de mana por 12 luas consecutivas.
+                <span class="text-cyan-200 font-medium block mt-1">✨ Recomendação: Junte R$ 3.600 em dinheiro para entrada de 50% ou aguarde 4 meses até a quitação do Notebook Arcano antes de forjar este compromisso.</span>
+</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- ================= 6. BOTÕES DE AÇÃO E DIRETRIZES DA GUILDA ================= -->
+<div class="space-y-2 pt-1 font-sans">
+<!-- Botão Primário Recomendado (Gema Azul / Ciano Reluzente) -->
+<button class="w-full py-3 px-4 rounded-lg psx-cyan-gem text-slate-950 font-bold text-xs tracking-wider uppercase flex items-center justify-center gap-2 hover:brightness-110 active:scale-[0.99] transition-all font-cinzel" type="button">
+<span class="material-symbols-outlined text-base">tune</span>
+<span>✨ Recalcular com Entrada de 50% ou Cancelar</span>
+</button>
+<!-- Botão de Suporte (Oráculo IA) -->
+<button class="w-full py-2.5 px-3 rounded-lg bg-gradient-to-r from-indigo-900/80 via-purple-900/70 to-indigo-950/80 border border-purple-400/50 text-purple-200 font-bold text-xs tracking-wide shadow-md hover:brightness-110 transition-all flex items-center justify-center gap-2" type="button">
+<span class="material-symbols-outlined text-base text-purple-300">magic_button</span>
+<span>🔮 Consultar Alternativa Segura com Oráculo (IA)</span>
+</button>
+<!-- Botão de Advertência de Risco -->
+<button class="w-full py-2.5 px-3 rounded-lg bg-[#140810] border border-rose-500/60 hover:bg-rose-950/40 text-rose-300 font-semibold text-xs tracking-wide transition-all flex items-center justify-center gap-2" type="button">
+<span class="material-symbols-outlined text-base text-rose-400">warning</span>
+<span>⚠️ Forçar Parcelamento com Risco (Desafio da Guilda) [ 12x R$ 600 ]</span>
+</button>
+<button class="w-full py-1 text-center font-mono text-[11px] text-cyan-400/70 hover:text-cyan-200 transition-colors" type="button">
+        Descartar Simulação / Retornar à Taverna
+      </button>
+</div>
+<!-- Nota Informativa Contábil de Competência (32-Bit Ledger Note) -->
+<div class="pt-2.5 border-t border-cyan-500/20 flex items-start gap-2 text-cyan-400/70">
+<span class="material-symbols-outlined text-sm mt-0.5 text-cyan-400 flex-shrink-0">menu_book</span>
+<p class="font-mono text-[9.5px] leading-relaxed text-slate-300">
+<strong class="text-cyan-300">Regime de Competência:</strong> A 1ª parcela de R$ 600 entrará na fatura de Nov/2024 sem deduzir o saldo bancário de liquidez imediata hoje, programando 12 obrigações recorrentes no livro contábil da guilda.
+      </p>
+</div>
+</div>
+</main>
+<!-- ================= 7. BOTTOM TAB NAVIGATION BAR (HUD 32-BIT) ================= -->
+<nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-[#070b18]/95 backdrop-blur-md border-t border-cyan-500/40 px-3 py-1.5 z-50 flex items-center justify-around shadow-[0_-8px_25px_rgba(0,0,0,0.8)]">
+<!-- Taverna -->
+<button class="flex flex-col items-center gap-0.5 py-1 px-2 text-slate-400 hover:text-cyan-200 transition-all">
+<span class="material-symbols-outlined text-lg">castle</span>
+<span class="font-mono text-[9px] font-medium tracking-tight">Taverna</span>
+</button>
+<!-- Mapa -->
+<button class="flex flex-col items-center gap-0.5 py-1 px-2 text-slate-400 hover:text-cyan-200 transition-all">
+<span class="material-symbols-outlined text-lg">explore</span>
+<span class="font-mono text-[9px] font-medium tracking-tight">Mapa</span>
+</button>
+<!-- Center Action Button: Forjar (Ativo com Orbe Luminoso & Espadas) -->
+<button class="relative -top-3 flex flex-col items-center group">
+<div class="w-12 h-12 rounded-full bg-gradient-to-tr from-cyan-400 via-sky-500 to-indigo-600 p-[2px] shadow-[0_0_18px_rgba(56,189,248,0.7)] group-hover:scale-105 group-active:scale-95 transition-all">
+<div class="w-full h-full bg-[#0a1226] rounded-full flex items-center justify-center text-cyan-300 relative overflow-hidden border border-cyan-300/40">
+<span class="material-symbols-outlined text-xl">swords</span>
+<div class="absolute inset-0 bg-cyan-400/20 rounded-full animate-ping opacity-30"></div>
+</div>
+</div>
+<span class="font-mono text-[8.5px] font-bold text-cyan-300 tracking-wider mt-0.5 drop-shadow-[0_0_6px_#38bdf8]">Forjar</span>
+</button>
+<!-- Guilda -->
+<button class="flex flex-col items-center gap-0.5 py-1 px-2 text-slate-400 hover:text-cyan-200 transition-all">
+<span class="material-symbols-outlined text-lg">shield</span>
+<span class="font-mono text-[9px] font-medium tracking-tight">Guilda</span>
+</button>
+<!-- Oráculo -->
+<button class="flex flex-col items-center gap-0.5 py-1 px-2 text-slate-400 hover:text-cyan-200 transition-all relative">
+<span class="material-symbols-outlined text-lg">magic_button</span>
+<span class="font-mono text-[9px] font-medium tracking-tight">Oráculo</span>
+<span class="absolute top-1 right-2.5 w-1.5 h-1.5 rounded-full bg-fuchsia-400 shadow-[0_0_6px_#f472b6]"></span>
+</button>
+</nav>
+</div>
+</body></html>
+
+<!-- Perfil do Guardião e Guilda RPG 32-Bit -->
+<!DOCTYPE html>
+
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Solstice Ledger — RPG Financeiro 32-Bit</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800;900&amp;family=Space+Grotesk:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;700&amp;family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "tertiary": "#cac8ff",
+            "primary": "#8ed5ff",
+            "surface-bright": "#31394d",
+            "outline": "#87929a",
+            "background": "#0b1326",
+            "surface-variant": "#2d3449",
+            "surface-dim": "#0b1326",
+            "surface-container": "#171f33",
+            "surface": "#0b1326",
+            "primary-container": "#38bdf8",
+            "outline-variant": "#3e484f",
+            "on-surface": "#dae2fd",
+            "secondary": "#ffafd3",
+            "on-surface-variant": "#bdc8d1",
+            "surface-container-high": "#222a3d",
+            "surface-container-low": "#131b2e",
+            "surface-container-lowest": "#060e20",
+            "surface-container-highest": "#2d3449",
+            "rpg-blue": "#0c1b3a",
+            "rpg-cyan": "#38bdf8",
+            "rpg-gold": "#fbbf24",
+            "rpg-emerald": "#34d399",
+            "rpg-amethyst": "#c084fc"
+          },
+          fontFamily: {
+            sans: ['"Space Grotesk"', 'sans-serif'],
+            cinzel: ['"Cinzel"', 'serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+            body: ['"Manrope"', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    /* 32-Bit Menu System styling (PS1 / Saturn Classic RPG Window) */
+    .rpg-window {
+      background: linear-gradient(135deg, rgba(16, 26, 56, 0.94) 0%, rgba(10, 18, 38, 0.96) 60%, rgba(6, 12, 28, 0.98) 100%);
+      border: 1px solid rgba(142, 213, 255, 0.35);
+      box-shadow: 0 8px 32px rgba(2, 6, 20, 0.7), 
+                  inset 0 1px 0 rgba(255, 255, 255, 0.22),
+                  inset 0 0 16px rgba(56, 189, 248, 0.08);
+      position: relative;
+    }
+
+    .rpg-window-cyan {
+      border-color: rgba(56, 189, 248, 0.6);
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.2), inset 0 1px 0 rgba(142, 213, 255, 0.4), inset 0 0 20px rgba(56, 189, 248, 0.12);
+    }
+
+    /* Bevel Corner Chrome (Classic JRPG bevel brackets) */
+    .corner-bracket::before, .corner-bracket::after {
+      content: '';
+      position: absolute;
+      width: 7px;
+      height: 7px;
+      pointer-events: none;
+    }
+    .corner-bracket::before {
+      top: -1px; left: -1px;
+      border-top: 2px solid #8ed5ff;
+      border-left: 2px solid #8ed5ff;
+    }
+    .corner-bracket::after {
+      top: -1px; right: -1px;
+      border-top: 2px solid #8ed5ff;
+      border-right: 2px solid #8ed5ff;
+    }
+
+    .corner-bottom::before, .corner-bottom::after {
+      content: '';
+      position: absolute;
+      width: 7px;
+      height: 7px;
+      pointer-events: none;
+    }
+    .corner-bottom::before {
+      bottom: -1px; left: -1px;
+      border-bottom: 2px solid #8ed5ff;
+      border-left: 2px solid #8ed5ff;
+    }
+    .corner-bottom::after {
+      bottom: -1px; right: -1px;
+      border-bottom: 2px solid #8ed5ff;
+      border-right: 2px solid #8ed5ff;
+    }
+
+    /* 32-bit Metallic Gem Buttons */
+    .gem-pill {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.02) 50%, rgba(0, 0, 0, 0.3) 100%);
+    }
+
+    /* Scanlines subtle retro PS1 feel */
+    .psx-scanlines {
+      background: linear-gradient(rgba(18, 24, 48, 0) 50%, rgba(0, 0, 0, 0.18) 50%);
+      background-size: 100% 3px;
+    }
+
+    /* High Precision Bar Glow */
+    .mana-bar-glow {
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+    }
+    .amber-bar-glow {
+      box-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+    }
+    .emerald-bar-glow {
+      box-shadow: 0 0 10px rgba(52, 211, 153, 0.5);
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #060e20;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1e2a4a;
+      border-radius: 4px;
+    }
+  </style>
+<meta content="mobile_tab" name="shell-type"/>
+</head>
+<body class="bg-[#050a17] text-[#dae2fd] font-sans min-h-screen antialiased selection:bg-cyan-500 selection:text-white pb-24">
+<!-- Mobile Frame Container (Optimal 32-Bit Frame) -->
+<div class="max-w-md mx-auto min-h-screen bg-gradient-to-b from-[#080e22] via-[#0d1532] to-[#12193b] relative flex flex-col shadow-2xl border-x border-[#1e2a4a]/70" id="app">
+<!-- ================= TOP GLOBAL HUD: 32-BIT TACTICAL BAR ================= -->
+<header class="sticky top-0 z-40 bg-[#0a1128]/95 backdrop-blur-md border-b border-[#38bdf8]/25 px-3 py-2.5 shadow-lg">
+<div class="flex items-center justify-between gap-2 mb-2">
+<!-- Logo & Solstice Crest -->
+<div class="flex items-center gap-2.5">
+<div class="w-8 h-8 rounded-sm bg-gradient-to-tr from-cyan-400 via-blue-600 to-indigo-700 p-[1.5px] shadow-sm relative corner-bracket">
+<div class="w-full h-full bg-[#0a122e] flex items-center justify-center">
+<span class="font-cinzel text-xs text-cyan-300 font-extrabold">✦</span>
+</div>
+</div>
+<div>
+<div class="flex items-center gap-1.5">
+<span class="font-cinzel tracking-wider text-xs font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-200 via-sky-300 to-blue-200 drop-shadow-[0_1px_3px_rgba(56,189,248,0.4)]">SOLSTICE</span>
+<span class="text-[9px] font-mono px-1.5 py-0.5 rounded-sm bg-[#162244] border border-[#38bdf8]/40 text-cyan-300 font-bold tracking-tight">32-BIT</span>
+</div>
+<p class="text-[10px] text-slate-300 font-body" id="sub-header-role">Guardião da Luz • Nvl 14</p>
+</div>
+</div>
+<!-- Mode Toggle: Solo vs Guilda -->
+<div class="flex items-center bg-[#091129] p-0.5 rounded-md border border-[#38bdf8]/30 shadow-inner">
+<button class="px-2.5 py-1 rounded-sm text-xs font-semibold transition-all bg-gradient-to-r from-cyan-500/25 to-blue-600/35 text-cyan-300 border border-cyan-400/40 shadow-sm" id="btn-mode-solo" onclick="setRealm('SOLO')">
+            Solo
+          </button>
+<button class="px-2.5 py-1 rounded-sm text-xs font-semibold text-slate-400 hover:text-slate-200 transition-all flex items-center gap-1.5" id="btn-mode-guild" onclick="setRealm('GUILDA')">
+<span>Guilda</span>
+<span class="w-1.5 h-1.5 rounded-full bg-pink-400 animate-pulse"></span>
+</button>
+</div>
+</div>
+<!-- Language / Tone Selector (Tom Atualizado: 3. RPG 32-Bit ATIVO) -->
+<div class="flex items-center justify-between gap-1.5 bg-[#060c1e] px-2 py-1 rounded-sm border border-[#22335c]/60 text-[11px]">
+<div class="text-[9px] font-mono text-cyan-300/90 uppercase tracking-wider flex items-center gap-1">
+<span class="material-symbols-outlined text-xs text-cyan-400">translate</span>
+          Tom:
+        </div>
+<div class="flex gap-1 flex-1 justify-end">
+<button class="px-2 py-0.5 rounded-sm text-[10px] font-medium transition-all text-slate-400 hover:text-white" id="lang-btn-1" onclick="setLanguageLevel(1)">
+            1. Fácil
+          </button>
+<button class="px-2 py-0.5 rounded-sm text-[10px] font-medium transition-all text-slate-400 hover:text-white" id="lang-btn-2" onclick="setLanguageLevel(2)">
+            2. Médio
+          </button>
+<button class="px-2.5 py-0.5 rounded-sm text-[10px] font-bold transition-all bg-gradient-to-r from-cyan-500/30 to-blue-600/40 text-cyan-200 border border-cyan-400/60 shadow-[0_0_8px_rgba(56,189,248,0.25)]" id="lang-btn-3" onclick="setLanguageLevel(3)">
+            3. RPG 32-Bit
+          </button>
+</div>
+</div>
+</header>
+<!-- ================= MAIN ONBOARDING CONTENT ================= -->
+<main class="flex-1 px-3 py-3 space-y-4"><div class="flex flex-col w-full space-y-4">
+<!-- ================= 1. STATUS CARD: GUARDIÃO & ALIANÇA 32-BIT ================= -->
+<section class="relative bg-gradient-to-b from-surface-container-high via-surface-container to-surface-container-low p-4 rounded-lg shadow-xl overflow-hidden">
+<!-- Ambient Luminous Rune Aura -->
+<div class="absolute -right-8 -top-8 w-40 h-40 bg-primary-container/15 rounded-full blur-3xl pointer-events-none"></div>
+<div class="absolute -left-10 -bottom-10 w-36 h-36 bg-secondary/15 rounded-full blur-3xl pointer-events-none"></div>
+<!-- Header Flag & Honor Title -->
+<div class="flex items-center justify-between gap-2 mb-3">
+<div class="flex items-center gap-1.5">
+<span class="text-xs text-primary font-bold">✦</span>
+<span class="font-headline-md text-title-sm text-primary tracking-wider uppercase">Ficha de Herói</span>
+<span class="font-label-code text-label-code bg-surface-container-highest px-2 py-0.5 rounded text-tertiary">32-BIT VER.</span>
+</div>
+<div class="flex items-center gap-1 bg-surface-container-lowest px-2 py-0.5 rounded text-label-code font-label-code text-primary">
+<span class="w-1.5 h-1.5 rounded-full bg-primary-container animate-ping"></span>
+<span>GUILDA VINCULADA</span>
+</div>
+</div>
+<!-- Dual Hero Astral Portrait Showcase -->
+<div class="flex flex-col sm:flex-row items-center gap-4 bg-surface-container-lowest/80 p-3 rounded-lg">
+<div class="relative flex items-center justify-center">
+<!-- Dual Avatar Overlap Rings -->
+<div class="relative w-16 h-16 rounded-full bg-gradient-to-tr from-primary to-primary-container p-0.5 shadow-lg">
+<div class="w-full h-full rounded-full bg-surface-dim flex items-center justify-center overflow-hidden">
+<!-- Valere Vector Motif -->
+<svg class="w-10 h-10 text-primary" fill="none" stroke="currentColor" stroke-width="1.8" viewbox="0 0 24 24">
+<circle cx="12" cy="8" r="4"></circle>
+<path d="M4 20c0-4 4-6 8-6s8 2 8 6"></path>
+<path d="M12 2v2m0 8v2" stroke-linecap="round"></path>
+</svg>
+</div>
+<span class="absolute -bottom-1 -right-1 font-label-code text-[10px] bg-primary text-on-primary px-1 rounded-sm font-bold">P1</span>
+</div>
+<div class="relative -ml-4 w-14 h-14 rounded-full bg-gradient-to-tr from-secondary to-secondary-container p-0.5 shadow-md">
+<div class="w-full h-full rounded-full bg-surface-dim flex items-center justify-center overflow-hidden">
+<!-- Zale Vector Motif -->
+<svg class="w-8 h-8 text-secondary" fill="none" stroke="currentColor" stroke-width="1.8" viewbox="0 0 24 24">
+<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+</svg>
+</div>
+<span class="absolute -bottom-1 -right-1 font-label-code text-[10px] bg-secondary text-on-secondary px-1 rounded-sm font-bold">P2</span>
+</div>
+</div>
+<!-- Identity & Subclass -->
+<div class="flex-1 text-center sm:text-left min-w-0">
+<div class="flex flex-wrap items-center justify-center sm:justify-start gap-1.5">
+<h2 class="font-headline-lg text-headline-md text-on-surface font-bold tracking-tight">Valere &amp; Zale</h2>
+<span class="font-label-code text-label-code bg-surface-container-high text-primary px-2 py-0.5 rounded font-semibold">NVL 14</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mt-0.5 truncate">
+          Guardião Protetor (Regra 50/20/30) • Aliança Solstice
+        </p>
+<!-- Pact Status Badge -->
+<div class="flex items-center justify-center sm:justify-start gap-2 mt-2">
+<div class="flex items-center gap-1 text-label-code font-label-code text-tertiary">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">favorite</span>
+<span>Pacto de Guilda (Casal)</span>
+</div>
+<span class="font-label-code text-label-code text-primary bg-primary/10 px-1.5 py-0.5 rounded">
+            Sincronia 100%
+          </span>
+</div>
+</div>
+</div>
+<!-- Active ATB EXP Gauge (Final Fantasy Style) -->
+<div class="mt-3 bg-surface-container-lowest/90 p-2.5 rounded-md">
+<div class="flex items-center justify-between font-label-code text-label-code mb-1">
+<span class="text-tertiary flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">bolt</span>
+          EXPERIÊNCIA ASTRAL (XP)
+        </span>
+<span class="text-primary font-bold">840 / 1.000 XP <span class="text-on-surface-variant font-normal">(+160 p/ Nv. 15)</span></span>
+</div>
+<!-- Pixel-Striped Gauge Bar -->
+<div class="relative w-full h-3 bg-surface-dim rounded overflow-hidden p-0.5">
+<div class="h-full bg-gradient-to-r from-primary-container via-primary to-tertiary rounded relative" style="width: 84%;">
+<div class="absolute inset-0 bg-[linear-gradient(45deg,rgba(255,255,255,0.2)_25%,transparent_25%,transparent_50%,rgba(255,255,255,0.2)_50%,rgba(255,255,255,0.2)_75%,transparent_75%,transparent)] bg-[length:8px_8px] opacity-60"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- ================= 2. STATS DE SABEDORIA FINANCEIRA (RPG 32-BIT ATTRIBUTES) ================= -->
+<section class="space-y-2">
+<div class="flex items-center justify-between px-1">
+<h3 class="font-headline-md text-title-sm text-on-surface flex items-center gap-1.5">
+<span class="material-symbols-outlined text-primary text-sm">shield</span>
+        Atributos de Sabedoria Financeira
+      </h3>
+<span class="font-label-code text-label-code text-on-surface-variant uppercase">Estatísticas Vitais</span>
+</div>
+<div class="grid grid-cols-2 gap-2">
+<!-- Vigor da Reserva (DEF) -->
+<div class="bg-surface-container p-3 rounded-lg shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="font-label-code text-label-code text-tertiary">DEF • VIGOR</span>
+<span class="material-symbols-outlined text-primary text-sm">shield_with_heart</span>
+</div>
+<div class="mt-2">
+<div class="font-stat-currency text-stat-currency text-primary leading-tight">4.2 <span class="text-body-md font-body-md text-on-surface-variant">Meses</span></div>
+<p class="font-body-md text-label-code text-on-surface-variant mt-0.5">Runway Reserva</p>
+</div>
+<div class="mt-2 pt-2 bg-surface-container-lowest/50 px-2 py-1 rounded text-label-code font-label-code text-primary flex items-center justify-between">
+<span>Status:</span>
+<span class="font-bold">Inquebrável</span>
+</div>
+</div>
+<!-- Disciplina Solar (ATK) -->
+<div class="bg-surface-container p-3 rounded-lg shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="font-label-code text-label-code text-secondary">ATK • DISCIPLINA</span>
+<span class="material-symbols-outlined text-secondary text-sm">sunny</span>
+</div>
+<div class="mt-2">
+<div class="font-stat-currency text-stat-currency text-secondary leading-tight">94%</div>
+<p class="font-body-md text-label-code text-on-surface-variant mt-0.5">Metas Cumpridas</p>
+</div>
+<div class="mt-2 pt-2 bg-surface-container-lowest/50 px-2 py-1 rounded text-label-code font-label-code text-secondary flex items-center justify-between">
+<span>Estouro Tetos:</span>
+<span class="font-bold">0% Nulo</span>
+</div>
+</div>
+<!-- Agilidade de Fluxo (SPD) -->
+<div class="bg-surface-container p-3 rounded-lg shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="font-label-code text-label-code text-primary-fixed">SPD • FLUXO</span>
+<span class="material-symbols-outlined text-primary-fixed text-sm">speed</span>
+</div>
+<div class="mt-2">
+<div class="font-stat-currency text-stat-currency text-on-surface leading-tight">R$ 85<span class="text-body-md font-body-md text-on-surface-variant">/dia</span></div>
+<p class="font-body-md text-label-code text-on-surface-variant mt-0.5">Safe-to-Spend Real</p>
+</div>
+<div class="mt-2 pt-2 bg-surface-container-lowest/50 px-2 py-1 rounded text-label-code font-label-code text-primary flex items-center justify-between">
+<span>Precisão:</span>
+<span class="font-bold">Sem Queima</span>
+</div>
+</div>
+<!-- Percepção Mística (INT) -->
+<div class="bg-surface-container p-3 rounded-lg shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="font-label-code text-label-code text-tertiary-fixed">INT • VISÃO</span>
+<span class="material-symbols-outlined text-tertiary-fixed text-sm">auto_fix_high</span>
+</div>
+<div class="mt-2">
+<div class="font-stat-currency text-stat-currency text-tertiary leading-tight">0 <span class="text-body-md font-body-md text-on-surface-variant">Dívidas</span></div>
+<p class="font-body-md text-label-code text-on-surface-variant mt-0.5">Juros Tóxicos</p>
+</div>
+<div class="mt-2 pt-2 bg-surface-container-lowest/50 px-2 py-1 rounded text-label-code font-label-code text-tertiary flex items-center justify-between">
+<span>Selic/Cartão:</span>
+<span class="font-bold">Blindado</span>
+</div>
+</div>
+</div>
+</section>
+<!-- ================= 3. ÁRVORE DE TALENTOS & HABILIDADES PASSIVAS ================= -->
+<section class="bg-surface-container p-4 rounded-lg shadow-md space-y-3">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-primary text-base">military_tech</span>
+<h3 class="font-headline-md text-title-sm text-on-surface">Grimório de Habilidades</h3>
+</div>
+<span class="font-label-code text-label-code text-primary font-bold">2 ATIVAS • 1 BLOQ</span>
+</div>
+<!-- Skill Item: Escudo Inquebrável -->
+<div class="flex items-start gap-3 bg-surface-container-low p-2.5 rounded-md">
+<div class="w-9 h-9 rounded bg-primary/20 flex items-center justify-center text-primary shrink-0 shadow-inner">
+<span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">security</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between gap-1">
+<h4 class="font-headline-md text-title-sm text-on-surface text-sm">Escudo Inquebrável</h4>
+<span class="font-label-code text-[11px] bg-primary text-on-primary px-1.5 py-0.2 rounded font-bold">PASSIVA DE CLASSE</span>
+</div>
+<p class="font-body-md text-label-code text-on-surface-variant mt-1 leading-snug">
+          Gera <span class="text-primary font-semibold">+15% de XP astral</span> de bônus automático a cada aporte creditado na Reserva Sagrada.
+        </p>
+</div>
+</div>
+<!-- Skill Item: Sinergia Astral (Guild Skill) -->
+<div class="flex items-start gap-3 bg-surface-container-low p-2.5 rounded-md">
+<div class="w-9 h-9 rounded bg-secondary/20 flex items-center justify-center text-secondary shrink-0 shadow-inner">
+<span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">hub</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between gap-1">
+<h4 class="font-headline-md text-title-sm text-on-surface text-sm">Sinergia Astral</h4>
+<span class="font-label-code text-[11px] bg-secondary-container text-on-secondary px-1.5 py-0.2 rounded font-bold">HABILIDADE GUILDA</span>
+</div>
+<p class="font-body-md text-label-code text-on-surface-variant mt-1 leading-snug">
+          Permite compensação mútua de até <span class="text-secondary font-semibold">5% de desvio</span> na barra de estilo de vida entre parceiros sem penalizar o mana do casal.
+        </p>
+</div>
+</div>
+<!-- Skill Item: Filtro Anti-Imprevisto (Locked Level 15) -->
+<div class="flex items-start gap-3 bg-surface-container-lowest/60 p-2.5 rounded-md opacity-75">
+<div class="w-9 h-9 rounded bg-surface-container-highest flex items-center justify-center text-on-surface-variant shrink-0">
+<span class="material-symbols-outlined text-lg">lock</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between gap-1">
+<h4 class="font-headline-md text-title-sm text-on-surface-variant text-sm">Filtro Anti-Imprevisto</h4>
+<span class="font-label-code text-[11px] bg-surface-container-high text-on-surface-variant px-1.5 py-0.2 rounded">NVL. 15 REQUERIDO</span>
+</div>
+<p class="font-body-md text-label-code text-on-surface-variant mt-1 leading-snug">
+          Atenua em <span class="font-semibold text-tertiary">30% o impacto</span> de emergências no Safe-to-Spend diário recalculado dinamicamente.
+        </p>
+</div>
+</div>
+</section>
+<!-- ================= 4. INVENTÁRIO DE RELÍQUIAS & SALA DE TROFÉUS ================= -->
+<section class="bg-surface-container p-4 rounded-lg shadow-md space-y-3">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-primary text-base">trophy</span>
+<h3 class="font-headline-md text-title-sm text-on-surface">Relíquias &amp; Honrarias</h3>
+</div>
+<span class="font-label-code text-label-code text-tertiary">SALA DE TROFÉUS</span>
+</div>
+<!-- Active Equipped Relic Slot -->
+<div class="bg-gradient-to-r from-surface-container-high to-surface-container-low p-3 rounded-md flex items-center justify-between gap-3 shadow-inner">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-gradient-to-tr from-primary to-primary-container p-0.5">
+<div class="w-full h-full bg-surface-dim rounded flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-xl">token</span>
+</div>
+</div>
+<div>
+<span class="font-label-code text-[10px] text-primary uppercase font-bold tracking-wide">Relíquia Equipada</span>
+<h4 class="font-headline-md text-title-sm text-on-surface text-sm">Amuleto do Solstício</h4>
+<p class="font-body-md text-label-code text-on-surface-variant">+1 Dia de Respiro no Combo de Economia</p>
+</div>
+</div>
+<button class="bg-surface-container-highest hover:bg-surface-bright text-on-surface font-label-code text-label-code px-2 py-1 rounded" onclick="alert('✦ Amuleto Ativo: Salva seu combo caso não registre um lançamento pontual em até 24h.')">
+        VER
+      </button>
+</div>
+<!-- Trophies Micro-Mosaics -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+<!-- Conquered: Mestre do Ponto de Equilíbrio -->
+<div class="bg-surface-container-low p-2.5 rounded flex items-start gap-2.5">
+<div class="text-primary mt-0.5">
+<span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
+</div>
+<div class="min-w-0">
+<h5 class="font-headline-md text-label-code font-bold text-on-surface truncate">Mestre do Ponto de Equilíbrio</h5>
+<p class="font-body-md text-label-code text-on-surface-variant">R$ 2.300 de Margem Livre</p>
+<span class="font-label-code text-[10px] text-tertiary">Conquistado há 15 Luas</span>
+</div>
+</div>
+<!-- Conquered: Escudo da Serenidade -->
+<div class="bg-surface-container-low p-2.5 rounded flex items-start gap-2.5">
+<div class="text-primary mt-0.5">
+<span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">award_star</span>
+</div>
+<div class="min-w-0">
+<h5 class="font-headline-md text-label-code font-bold text-on-surface truncate">Escudo da Serenidade</h5>
+<p class="font-body-md text-label-code text-on-surface-variant">3+ Meses de Runway Concluídos</p>
+<span class="font-label-code text-[10px] text-primary">Consagrado na Guilda</span>
+</div>
+</div>
+</div>
+<!-- In-Progress Trophy: Fortaleza de 6 Meses -->
+<div class="bg-surface-container-lowest p-3 rounded-md space-y-2">
+<div class="flex items-center justify-between text-label-code font-label-code">
+<span class="text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">lock_clock</span>
+          Fortaleza de 6 Meses (R$ 25.200)
+        </span>
+<span class="text-primary font-bold">70% Concluído</span>
+</div>
+<div class="w-full h-2 bg-surface-dim rounded-full overflow-hidden">
+<div class="h-full bg-gradient-to-r from-primary-container to-primary" style="width: 70%;"></div>
+</div>
+<p class="font-label-code text-[11px] text-on-surface-variant text-right">
+        Faltam <span class="text-primary font-semibold">R$ 7.560</span> para erguer a fortaleza definitiva.
+      </p>
+</div>
+</section>
+<!-- ================= 5. MEMBROS DA GUILDA (COOPERATIVA DO CASAL) ================= -->
+<section class="bg-surface-container p-4 rounded-lg shadow-md space-y-3">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-secondary text-base">diversity_3</span>
+<h3 class="font-headline-md text-title-sm text-on-surface">Membros da Aliança</h3>
+</div>
+<span class="font-label-code text-label-code text-secondary">2 GUARDIÕES</span>
+</div>
+<!-- Member 1: Valere (User) -->
+<div class="bg-surface-container-low p-3 rounded-md flex items-center justify-between gap-2">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-9 h-9 rounded bg-primary/20 text-primary flex items-center justify-center font-bold font-label-code text-xs">
+          V
+        </div>
+<div class="min-w-0">
+<div class="flex items-center gap-1.5">
+<h4 class="font-headline-md text-title-sm text-on-surface text-sm truncate">Valere (Você)</h4>
+<span class="font-label-code text-[10px] bg-primary text-on-primary px-1.5 rounded font-bold">LÍDER</span>
+</div>
+<p class="font-body-md text-label-code text-on-surface-variant truncate">Guardião Protetor • R$ 1.500/mês</p>
+</div>
+</div>
+<div class="text-right shrink-0">
+<span class="font-label-code text-[11px] text-primary block">Reserva &amp; Fixo</span>
+<span class="font-label-code text-[10px] text-on-surface-variant">55% do Co-Op</span>
+</div>
+</div>
+<!-- Member 2: Zale (Partner) -->
+<div class="bg-surface-container-low p-3 rounded-md flex items-center justify-between gap-2">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-9 h-9 rounded bg-secondary/20 text-secondary flex items-center justify-center font-bold font-label-code text-xs">
+          Z
+        </div>
+<div class="min-w-0">
+<div class="flex items-center gap-1.5">
+<h4 class="font-headline-md text-title-sm text-on-surface text-sm truncate">Zale (Parceiro)</h4>
+<span class="font-label-code text-[10px] bg-secondary-container text-on-secondary px-1.5 rounded font-bold">ALIADO</span>
+</div>
+<p class="font-body-md text-label-code text-on-surface-variant truncate">Explorador Ágil • R$ 1.200/mês</p>
+</div>
+</div>
+<div class="text-right shrink-0">
+<span class="font-label-code text-[11px] text-secondary block">Lazer &amp; Variáveis</span>
+<span class="font-label-code text-[10px] text-on-surface-variant">45% do Co-Op</span>
+</div>
+</div>
+<!-- Guild Pact Actions -->
+<div class="grid grid-cols-2 gap-2 pt-1">
+<button class="bg-surface-container-highest hover:bg-surface-bright text-on-surface font-label-code text-label-code py-2 px-3 rounded flex items-center justify-center gap-1.5 transition-colors" onclick="alert('✦ Gerenciador de Pacto:\nProporção atual de divisão: 55% Valere / 45% Zale com sincronia de cartões ativada.')">
+<span class="material-symbols-outlined text-sm">settings_suggest</span>
+        Ajustar Pacto
+      </button>
+<button class="bg-surface-container-highest hover:bg-surface-bright text-tertiary font-label-code text-label-code py-2 px-3 rounded flex items-center justify-center gap-1.5 transition-colors" onclick="alert('✦ Código Arcano de Conexão:\nSOLSTICE-7734-LUNAR\nCompartilhe com seu parceiro para vincular a carteira.')">
+<span class="material-symbols-outlined text-sm">share</span>
+        Código Arcano
+      </button>
+</div>
+</section>
+<!-- ================= 6. CONSELHO DO ORÁCULO & AÇÕES TÁTICAS ================= -->
+<section class="bg-gradient-to-r from-surface-container-high via-surface-container to-surface-container-high p-4 rounded-lg shadow-lg space-y-3">
+<!-- Oracle Tip Card -->
+<div class="flex items-start gap-3 bg-surface-container-lowest/80 p-3 rounded-md">
+<span class="text-xl">🔮</span>
+<div>
+<h4 class="font-headline-md text-title-sm text-primary text-sm">Conselho do Oráculo Solstice</h4>
+<p class="font-body-md text-body-md text-on-surface-variant mt-0.5 leading-snug">
+          "A aliança acumulou 14 dias sem vazamentos de mana. Se mantiverem o ritmo até a Lua Nova, o cofre renderá 100 XP extras para a guilda."
+        </p>
+</div>
+</div>
+<!-- Tactical Buttons -->
+<div class="space-y-2">
+<!-- Primary Sync CTA -->
+<button class="w-full bg-gradient-to-r from-primary-container via-primary to-inverse-primary text-on-primary font-headline-md text-title-sm py-3 px-4 rounded-md shadow-lg flex items-center justify-center gap-2 active:scale-98 transition-transform font-bold" onclick="alert('✦ Sincronizando Livros da Guilda...\nBalanço de Valere &amp; Zale equalizado com sucesso!')">
+<span class="material-symbols-outlined text-lg">sync</span>
+        SINCRONIZAR BALANÇO DA GUILDA [ SYNC ]
+      </button>
+<!-- Secondary Certificate/Report CTA -->
+<button class="w-full bg-surface-container-low hover:bg-surface-container-highest text-on-surface font-label-code text-label-code py-2.5 px-4 rounded-md flex items-center justify-center gap-2 transition-colors" onclick="alert('✦ Certificado Solstice Ledger:\nRelatório de fechamento mensal gerado em formato criptografado para backup local.')">
+<span class="material-symbols-outlined text-sm text-tertiary">download</span>
+        EXPORTAR CERTIFICADO DA JORNADA (BACKUP/RELATÓRIO)
+      </button>
+</div>
+</section>
+</div></main>
+<!-- ================= GLOBAL BOTTOM NAVIGATION (5 TABS - 32-BIT VISUAL) ================= -->
+<nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-[#070e24]/95 backdrop-blur-md border-t border-[#38bdf8]/30 px-3 py-1.5 z-50 flex items-center justify-around shadow-2xl">
+<button class="flex flex-col items-center gap-0.5 py-1 px-2 rounded-sm text-cyan-300 transition-all" id="nav-tavern" onclick="switchTab('tavern')">
+<span class="text-sm">🏰</span>
+<span class="text-[9px] font-mono tracking-tight font-bold">Taverna</span>
+</button>
+<button class="flex flex-col items-center gap-0.5 py-1 px-2 rounded-sm text-slate-400 hover:text-white transition-all" id="nav-stars" onclick="switchTab('stars')">
+<span class="text-sm">🌌</span>
+<span class="text-[9px] font-mono tracking-tight">Mapa</span>
+</button>
+<!-- Center Action Button: Forja de Lançamento 32-Bit -->
+<button class="relative -top-2 flex flex-col items-center" id="nav-forge" onclick="switchTab('forge')">
+<div class="w-11 h-11 rounded-full bg-gradient-to-tr from-cyan-400 via-sky-500 to-indigo-600 p-[1.5px] shadow-[0_0_15px_rgba(56,189,248,0.5)] hover:scale-105 active:scale-95 transition-all">
+<div class="w-full h-full bg-[#0a122e] rounded-full flex items-center justify-center text-base text-cyan-300 font-bold border border-cyan-300/40">
+            ⚔️
+          </div>
+</div>
+<span class="text-[8px] font-mono font-bold text-cyan-300 mt-0.5">Forjar</span>
+</button>
+<button class="flex flex-col items-center gap-0.5 py-1 px-2 rounded-sm text-slate-400 hover:text-white transition-all" id="nav-guild" onclick="switchTab('guild')">
+<span class="text-sm">🛡️</span>
+<span class="text-[9px] font-mono tracking-tight">Guilda</span>
+</button>
+<button class="flex flex-col items-center gap-0.5 py-1 px-2 rounded-sm text-slate-400 hover:text-white transition-all relative" id="nav-oracle" onclick="switchTab('oracle')">
+<span class="text-sm">🔮</span>
+<span class="text-[9px] font-mono tracking-tight">Oráculo</span>
+<span class="absolute top-1 right-2 w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_6px_#38bdf8]"></span>
+</button>
+</nav>
+</div>
+<!-- ================= LOGIC & INTERACTION SCRIPTS ================= -->
+<script>
+    // State for character creation
+    const HERO_STATE = {
+      archetype: 'valere',
+      aura: 'solar',
+      relic: 'amulet',
+      selectedClass: 'guardian',
+      mode: 'solo',
+      monthlyIncome: 5000,
+      classesData: {
+        guardian: { name: 'Guardião', essential: 0.50, lifestyle: 0.20, reserve: 0.30 },
+        explorer: { name: 'Explorador', essential: 0.55, lifestyle: 0.30, reserve: 0.15 },
+        alchemist: { name: 'Alquimista', essential: 0.60, lifestyle: 0.15, reserve: 0.25 }
+      }
+    };
+
+    function selectHeroArchetype(heroKey) {
+      HERO_STATE.archetype = heroKey;
+
+      // Reset button rings
+      document.querySelectorAll('.archetype-btn').forEach(btn => {
+        btn.classList.remove('border-cyan-400/60', 'bg-[#152347]', 'shadow-sm', 'corner-bracket');
+        btn.classList.add('bg-[#0b1328]', 'border-[#22335c]');
+      });
+
+      const activeBtn = document.getElementById(`hero-btn-${heroKey}`);
+      if (activeBtn) {
+        activeBtn.classList.remove('bg-[#0b1328]', 'border-[#22335c]');
+        activeBtn.classList.add('bg-[#152347]', 'border-cyan-400/60', 'shadow-sm', 'corner-bracket');
+      }
+
+      const titleEl = document.getElementById('hero-display-class');
+      const descEl = document.getElementById('hero-display-desc');
+      const tagEl = document.getElementById('hero-selected-tag');
+      const hairSvg = document.getElementById('svg-hair');
+      const hairLocks = document.getElementById('svg-hair-locks');
+      const capeSvg = document.getElementById('svg-cape');
+      const nameInput = document.getElementById('guardian-name-input');
+
+      if (heroKey === 'valere') {
+        titleEl.textContent = '✦ VALERE — LÂMINA SOLAR ✦';
+        descEl.textContent = 'Empunha a disciplina do astro-rei para queimar desperdícios e nutrir a reserva sagrada.';
+        tagEl.textContent = 'SOLAR';
+        hairSvg.setAttribute('fill', '#fbbf24');
+        hairLocks.setAttribute('fill', '#f59e0b');
+        capeSvg.setAttribute('fill', '#243063');
+        nameInput.value = 'Valere Solis';
+        setAuraColor('solar');
+      } else if (heroKey === 'zale') {
+        titleEl.textContent = '✦ ZALE — GUERREIRO LUNAR ✦';
+        descEl.textContent = 'Canaliza a precisão da lua para manter fluxos de caixa equilibrados e precisos.';
+        tagEl.textContent = 'LUNAR';
+        hairSvg.setAttribute('fill', '#38bdf8');
+        hairLocks.setAttribute('fill', '#0284c7');
+        capeSvg.setAttribute('fill', '#0f172a');
+        nameInput.value = 'Zale Lunari';
+        setAuraColor('lunar');
+      } else if (heroKey === 'moraine') {
+        titleEl.textContent = '✦ MORAINE — GUARDIÃO ANCIÃO ✦';
+        descEl.textContent = 'Mestre dos cofres do tempo. Prefere investimentos estruturados e reservas impenetráveis.';
+        tagEl.textContent = 'ANCIÃO';
+        hairSvg.setAttribute('fill', '#94a3b8');
+        hairLocks.setAttribute('fill', '#64748b');
+        capeSvg.setAttribute('fill', '#064e3b');
+        nameInput.value = 'Mestre Moraine';
+        setAuraColor('emerald');
+      } else if (heroKey === 'serai') {
+        titleEl.textContent = '✦ SERAÏ — ANDARILHO DO VAZIO ✦';
+        descEl.textContent = 'Especialista em desviar de taxas ocultas e cortar dívidas velozmente nas sombras.';
+        tagEl.textContent = 'VAZIO';
+        hairSvg.setAttribute('fill', '#c084fc');
+        hairLocks.setAttribute('fill', '#9333ea');
+        capeSvg.setAttribute('fill', '#4c1d95');
+        nameInput.value = 'Seraï da Névoa';
+        setAuraColor('amethyst');
+      }
+    }
+
+    function setAuraColor(colorKey) {
+      HERO_STATE.aura = colorKey;
+      const auraGlow = document.getElementById('character-aura-glow');
+      const gem = document.getElementById('svg-armor-gem');
+      const relicGlow = document.getElementById('svg-relic-glow');
+
+      // Reset aura buttons
+      document.querySelectorAll('.aura-btn').forEach(btn => {
+        btn.classList.remove('border-amber-400/70', 'border-sky-400/70', 'border-emerald-400/70', 'border-purple-400/70', 'bg-[#132042]', 'shadow-[0_0_10px_rgba(245,158,11,0.2)]');
+        btn.classList.add('bg-[#0b1328]', 'border-[#22335c]');
+      });
+
+      const clickedBtn = event ? event.currentTarget : null;
+      if (clickedBtn) {
+        clickedBtn.classList.remove('bg-[#0b1328]', 'border-[#22335c]');
+        clickedBtn.classList.add('bg-[#132042]');
+      }
+
+      if (colorKey === 'solar') {
+        auraGlow.className = 'absolute w-44 h-44 rounded-full blur-2xl transition-all duration-700 opacity-60 bg-amber-400/60';
+        gem.setAttribute('fill', '#f59e0b');
+        if (relicGlow) relicGlow.setAttribute('fill', '#fbbf24');
+      } else if (colorKey === 'lunar') {
+        auraGlow.className = 'absolute w-44 h-44 rounded-full blur-2xl transition-all duration-700 opacity-60 bg-sky-400/60';
+        gem.setAttribute('fill', '#38bdf8');
+        if (relicGlow) relicGlow.setAttribute('fill', '#38bdf8');
+      } else if (colorKey === 'emerald') {
+        auraGlow.className = 'absolute w-44 h-44 rounded-full blur-2xl transition-all duration-700 opacity-60 bg-emerald-400/60';
+        gem.setAttribute('fill', '#10b981');
+        if (relicGlow) relicGlow.setAttribute('fill', '#34d399');
+      } else if (colorKey === 'amethyst') {
+        auraGlow.className = 'absolute w-44 h-44 rounded-full blur-2xl transition-all duration-700 opacity-60 bg-purple-500/60';
+        gem.setAttribute('fill', '#a855f7');
+        if (relicGlow) relicGlow.setAttribute('fill', '#c084fc');
+      }
+    }
+
+    function changeRelic(relicType) {
+      HERO_STATE.relic = relicType;
+      const relicCore = document.getElementById('svg-relic-core');
+      if (relicType === 'amulet') relicCore.setAttribute('fill', '#38bdf8');
+      if (relicType === 'ring') relicCore.setAttribute('fill', '#f59e0b');
+      if (relicType === 'cloak') relicCore.setAttribute('fill', '#ec4899');
+      if (relicType === 'compass') relicCore.setAttribute('fill', '#a855f7');
+    }
+
+    function selectClassArchetype(classKey) {
+      HERO_STATE.selectedClass = classKey;
+
+      const classes = ['guardian', 'explorer', 'alchemist'];
+      classes.forEach(c => {
+        const cardEl = document.getElementById(`class-card-${c}`);
+        const indicatorEl = document.getElementById(`class-indicator-${c}`);
+        
+        if (c === classKey) {
+          cardEl.classList.remove('opacity-80');
+          cardEl.classList.add('rpg-window-cyan', 'corner-bracket');
+          indicatorEl.textContent = 'check_circle';
+          indicatorEl.classList.add('text-cyan-300');
+          indicatorEl.classList.remove('text-slate-400');
+          indicatorEl.style.fontVariationSettings = "'FILL' 1";
+        } else {
+          cardEl.classList.add('opacity-80');
+          cardEl.classList.remove('rpg-window-cyan', 'corner-bracket');
+          indicatorEl.textContent = 'radio_button_unchecked';
+          indicatorEl.classList.remove('text-cyan-300');
+          indicatorEl.classList.add('text-slate-400');
+          indicatorEl.style.fontVariationSettings = "'FILL' 0";
+        }
+      });
+
+      recalculateProportions();
+    }
+
+    function setModeSwitch(mode) {
+      HERO_STATE.mode = mode;
+      const btnSolo = document.getElementById('pact-btn-solo');
+      const btnGuild = document.getElementById('pact-btn-guild');
+
+      if (mode === 'solo') {
+        btnSolo.className = "py-2 px-3 rounded-sm font-cinzel text-xs font-bold bg-gradient-to-r from-cyan-500/30 to-blue-600/35 text-cyan-200 border border-cyan-400/50 flex items-center justify-center gap-1.5 shadow-sm transition-all";
+        btnGuild.className = "py-2 px-3 rounded-sm font-cinzel text-xs font-bold text-slate-400 hover:text-white flex items-center justify-center gap-1.5 transition-all";
+      } else {
+        btnGuild.className = "py-2 px-3 rounded-sm font-cinzel text-xs font-bold bg-gradient-to-r from-pink-500/30 to-purple-600/35 text-pink-200 border border-pink-400/50 flex items-center justify-center gap-1.5 shadow-sm transition-all";
+        btnSolo.className = "py-2 px-3 rounded-sm font-cinzel text-xs font-bold text-slate-400 hover:text-white flex items-center justify-center gap-1.5 transition-all";
+      }
+    }
+
+    function recalculateProportions() {
+      const input = document.getElementById('monthly-income-input');
+      let income = parseFloat(input.value);
+      if (isNaN(income) || income <= 0) income = 5000;
+
+      HERO_STATE.monthlyIncome = income;
+      const classData = HERO_STATE.classesData[HERO_STATE.selectedClass];
+
+      const essentialVal = income * classData.essential;
+      const lifestyleVal = income * classData.lifestyle;
+      const reserveVal = income * classData.reserve;
+
+      const nameDisplay = document.getElementById('calculated-class-name');
+      nameDisplay.textContent = `${classData.name} (${Math.round(classData.essential*100)}/${Math.round(classData.lifestyle*100)}/${Math.round(classData.reserve*100)})`;
+
+      document.getElementById('calc-val-essential').textContent = `R$ ${essentialVal.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+      document.getElementById('calc-val-lifestyle').textContent = `R$ ${lifestyleVal.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+      document.getElementById('calc-val-reserve').textContent = `R$ ${reserveVal.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+    }
+
+    function completeOnboarding() {
+      const guardianName = document.getElementById('guardian-name-input').value.trim() || 'Valere Solis';
+      const classInfo = HERO_STATE.classesData[HERO_STATE.selectedClass];
+
+      alert(`✦ Registro Forjado com Sucesso! ✦\nBem-vindo ao Solstice Ledger (Modo 32-Bit), ${guardianName}.\nClasse Consagrada: ${classInfo.name}\nRenda Base: R$ ${HERO_STATE.monthlyIncome.toFixed(2)}`);
+    }
+
+    function triggerLoadBackup() {
+      alert("🌌 Oráculo Solstice:\nSelecione um arquivo .json de backup do reino ou extrato bancário .OFX para restaurar seu inventário contábil 32-bit.");
+    }
+
+    function setLanguageLevel(level) {
+      for (let i = 1; i <= 3; i++) {
+        const btn = document.getElementById(`lang-btn-${i}`);
+        if (btn) {
+          if (i === level) {
+            btn.className = "px-2 py-0.5 rounded-sm text-[10px] font-bold transition-all bg-gradient-to-r from-cyan-500/30 to-blue-600/40 text-cyan-200 border border-cyan-400/60 shadow-[0_0_8px_rgba(56,189,248,0.25)]";
+          } else {
+            btn.className = "px-2 py-0.5 rounded-sm text-[10px] font-medium transition-all text-slate-400 hover:text-white";
+          }
+        }
+      }
+    }
+
+    function setRealm(realm) {
+      const btnSolo = document.getElementById('btn-mode-solo');
+      const btnGuild = document.getElementById('btn-mode-guild');
+      if (realm === 'SOLO') {
+        btnSolo.className = "px-2.5 py-1 rounded-sm text-xs font-semibold transition-all bg-gradient-to-r from-cyan-500/25 to-blue-600/35 text-cyan-300 border border-cyan-400/40 shadow-sm";
+        btnGuild.className = "px-2.5 py-1 rounded-sm text-xs font-semibold text-slate-400 hover:text-slate-200 transition-all flex items-center gap-1.5";
+      } else {
+        btnGuild.className = "px-2.5 py-1 rounded-sm text-xs font-semibold transition-all bg-gradient-to-r from-pink-500/25 to-purple-600/35 text-pink-300 border border-pink-400/40 shadow-sm flex items-center gap-1.5";
+        btnSolo.className = "px-2.5 py-1 rounded-sm text-xs font-semibold text-slate-400 hover:text-slate-200 transition-all";
+      }
+    }
+
+    function switchTab(tabId) {
+      ['tavern', 'stars', 'guild', 'oracle'].forEach(nav => {
+        const btn = document.getElementById(`nav-${nav}`);
+        if (btn) {
+          if (nav === tabId) {
+            btn.classList.add('text-cyan-300');
+            btn.classList.remove('text-slate-400');
+          } else {
+            btn.classList.remove('text-cyan-300');
+            btn.classList.add('text-slate-400');
+          }
+        }
+      });
+    }
+
+    // Initialize calculation on load
+    window.addEventListener('DOMContentLoaded', () => {
+      recalculateProportions();
+    });
+  </script>
+</body></html>

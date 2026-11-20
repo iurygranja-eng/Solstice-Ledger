@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Solstice Ledger — Forja &amp; Simulador 32-Bit</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            cinzel: ['"Cinzel"', 'serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            rpg32: {
+              bg: '#080d1a',
+              window: '#0e172a',
+              windowDeep: '#070b14',
+              frame: '#1e293b',
+              frameGlow: '#38bdf8',
+              borderCyan: 'rgba(56, 189, 248, 0.45)',
+              gold: '#f6d860',
+              ruby: '#ef4444',
+              mana: '#38bdf8',
+              violet: '#a855f7',
+              emerald: '#10b981'
+            }
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    /* Classic 32-Bit PS1/Saturn Window Gradients & Metallic Bevels */
+    .psx-window {
+      background: linear-gradient(180deg, #131d38 0%, #0d1428 55%, #080d1c 100%);
+      border: 1.5px solid rgba(56, 189, 248, 0.4);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.75), 
+                  inset 0 1px 0 rgba(255, 255, 255, 0.22),
+                  inset 0 -1px 0 rgba(0, 0, 0, 0.8),
+                  0 0 16px rgba(56, 189, 248, 0.12);
+      position: relative;
+    }
+
+    .psx-window::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent 0%, rgba(125, 211, 252, 0.8) 50%, transparent 100%);
+      pointer-events: none;
+    }
+
+    .psx-window-danger {
+      background: linear-gradient(180deg, #24111d 0%, #170912 60%, #0e050b 100%);
+      border: 1.5px solid rgba(239, 68, 68, 0.55);
+      box-shadow: 0 8px 24px rgba(220, 38, 38, 0.2), 
+                  inset 0 1px 0 rgba(254, 202, 202, 0.25),
+                  0 0 18px rgba(239, 68, 68, 0.15);
+      position: relative;
+    }
+
+    .psx-bevel-button {
+      background: linear-gradient(180deg, #22345e 0%, #152240 60%, #0c1428 100%);
+      border: 1px solid rgba(125, 211, 252, 0.5);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 
+                  0 3px 6px rgba(0,0,0,0.4);
+    }
+    .psx-bevel-button:active {
+      transform: translateY(1px);
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.6);
+    }
+
+    .psx-cyan-gem {
+      background: linear-gradient(180deg, #38bdf8 0%, #0284c7 60%, #0369a1 100%);
+      box-shadow: 0 4px 14px rgba(56, 189, 248, 0.4), 
+                  inset 0 1px 1px rgba(255, 255, 255, 0.6),
+                  inset 0 -1px 2px rgba(0,0,0,0.5);
+    }
+
+    .psx-corner-bracket::before, .psx-corner-bracket::after {
+      content: '';
+      position: absolute;
+      width: 7px;
+      height: 7px;
+      border-color: #38bdf8;
+      pointer-events: none;
+    }
+    .psx-corner-bracket::before {
+      top: -1px; left: -1px;
+      border-top: 2px solid #38bdf8;
+      border-left: 2px solid #38bdf8;
+    }
+    .psx-corner-bracket::after {
+      bottom: -1px; right: -1px;
+      border-bottom: 2px solid #38bdf8;
+      border-right: 2px solid #38bdf8;
+    }
+
+    /* Subdued scanlines reminiscent of classic 32-bit CRT / Sony Trinitron */
+    .scanlines-overlay {
+      background: linear-gradient(rgba(18, 24, 38, 0) 50%, rgba(3, 7, 18, 0.28) 50%);
+      background-size: 100% 3px;
+    }
+
+    /* ATB Bar Shimmer */
+    .atb-bar {
+      background: linear-gradient(90deg, #ef4444 0%, #f43f5e 40%, #fb7185 100%);
+      box-shadow: 0 0 10px rgba(244, 63, 94, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.4);
+    }
+  </style>
+<meta content="mobile_tab" name="shell-type"/></head>
+<body class="bg-[#050811] text-slate-100 font-sans min-h-screen antialiased selection:bg-cyan-500 selection:text-black pb-28">
+<!-- Scanline & Ambient Cosmic Vignette Layer -->
+<div class="fixed inset-0 scanlines-overlay pointer-events-none z-30 opacity-70"></div>
+<!-- Mobile Frame Container (PlayStation / Saturn Visual Masterpiece) -->
+<div class="max-w-md mx-auto min-h-screen bg-gradient-to-b from-[#070b16] via-[#0d1428] to-[#120f26] relative flex flex-col shadow-2xl border-x border-cyan-950/40" id="app">
+<!-- ================= 1. HEADER & TOPO 32-BIT SOLSTICE ================= -->
+<header class="sticky top-0 z-40 bg-[#091124]/95 backdrop-blur-md border-b border-cyan-500/30 px-3.5 py-2.5 shadow-lg">
+<div class="flex items-center justify-between gap-2 mb-2">
+<!-- Solstice Crest & Status -->
+<div class="flex items-center gap-2.5">
+<div class="relative w-9 h-9 rounded-md bg-gradient-to-tr from-cyan-600 via-indigo-600 to-fuchsia-500 p-[1.5px] shadow-[0_0_12px_rgba(56,189,248,0.4)]">
+<div class="w-full h-full bg-[#0a1122] rounded-sm flex items-center justify-center relative overflow-hidden">
+<span class="material-symbols-outlined text-cyan-300 text-lg">auto_awesome</span>
+<div class="absolute inset-0 bg-gradient-to-t from-transparent via-cyan-400/20 to-transparent"></div>
+</div>
+</div>
+<div>
+<div class="flex items-center gap-1.5">
+<span class="font-cinzel font-bold text-xs tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-cyan-200 via-sky-300 to-indigo-200">SOLSTICE</span>
+<span class="text-[9px] font-mono font-bold px-1.5 py-0.2 rounded bg-gradient-to-r from-amber-500/20 to-yellow-500/10 border border-amber-400/50 text-amber-300 tracking-wider shadow-[0_0_8px_rgba(251,191,36,0.3)] animate-pulse">32-BIT</span>
+</div>
+<p class="text-[10px] text-cyan-200/80 font-medium flex items-center gap-1">
+<span>Guardião da Luz</span>
+<span class="w-1 h-1 rounded-full bg-cyan-400"></span>
+<span class="text-amber-300 font-mono font-semibold">Nv. 14</span>
+</p>
+</div>
+</div>
+<!-- Mode Toggle: Solo vs Guilda (32-Bit Bevel Switch) -->
+<div class="flex items-center bg-[#070d1d] p-0.5 rounded-md border border-cyan-500/40 shadow-inner">
+<button class="px-2.5 py-1 rounded text-xs font-semibold bg-gradient-to-r from-cyan-500/25 to-sky-600/35 text-cyan-300 border border-cyan-400/40 shadow-sm" id="btn-mode-solo">
+        Solo
+      </button>
+<button class="px-2.5 py-1 rounded text-xs font-semibold text-slate-400 hover:text-slate-200 flex items-center gap-1 transition-all" id="btn-mode-guild">
+<span>Guilda</span>
+<span class="w-1.5 h-1.5 rounded-full bg-fuchsia-400 shadow-[0_0_6px_#f472b6]"></span>
+</button>
+</div>
+</div>
+<!-- Language Tier Selector (1. Fácil | 2. Médio | 3. RPG 32-Bit Ativo) -->
+<div class="flex items-center justify-between gap-1.5 bg-[#060a17] p-1 rounded-md border border-cyan-500/20 text-[11px]">
+<div class="text-[9px] font-mono text-cyan-400/90 pl-1 uppercase tracking-wider flex items-center gap-1 font-semibold">
+<span class="material-symbols-outlined text-[13px] text-cyan-400">translate</span>
+      Tom:
+    </div>
+<div class="flex gap-1 flex-1 justify-end font-mono">
+<button class="px-2 py-0.5 rounded text-[10px] text-slate-400 hover:text-white transition-all">
+        1. Fácil
+      </button>
+<button class="px-2 py-0.5 rounded text-[10px] text-slate-400 hover:text-white transition-all">
+        2. Médio
+      </button>
+<button class="px-2 py-0.5 rounded text-[10px] font-bold bg-gradient-to-r from-cyan-600/60 to-indigo-600/70 text-cyan-200 border border-cyan-400/60 shadow-[0_0_8px_rgba(56,189,248,0.35)]">
+        3. RPG 32-Bit
+      </button>
+</div>
+</div>
+</header>
+<!-- ================= CONTENT VIEWS: FORJA & SIMULADOR ================= -->
+<main class="flex-1 px-3.5 py-3.5 space-y-4">
+<!-- CONTEXT HEADER: FORJA DE LANÇAMENTOS -->
+<div class="space-y-2.5">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="text-cyan-400 material-symbols-outlined text-base">hardware</span>
+<span class="font-mono text-xs tracking-wider text-cyan-300 font-bold uppercase">FORJA // SIMULADOR ASTRAL</span>
+</div>
+<div class="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-cyan-950/70 border border-cyan-400/40 text-cyan-300 font-mono text-[10px] shadow-[0_0_10px_rgba(56,189,248,0.2)]">
+<span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping"></span>
+<span class="font-semibold tracking-wide">MODAL ATIVO: SIMULAÇÃO</span>
+</div>
+</div>
+<!-- TABS DE MODO DA FORJA (32-BIT TABS) -->
+<div class="grid grid-cols-3 gap-1.5 p-1 bg-[#070c1a] rounded-lg border border-cyan-950/70">
+<button class="py-1.5 px-1 rounded text-center font-sans text-[11px] font-semibold text-slate-400 hover:text-cyan-200 hover:bg-slate-800/40 transition-all" type="button">
+        Lançamento Rápido
+      </button>
+<button class="py-1.5 px-1 rounded text-center font-sans font-bold text-[11px] bg-gradient-to-r from-cyan-500/25 via-indigo-600/40 to-cyan-500/25 text-cyan-300 border border-cyan-400/50 shadow-[0_0_12px_rgba(56,189,248,0.25)] relative overflow-hidden" type="button">
+<span class="relative z-10 flex items-center justify-center gap-1">
+<span class="text-cyan-300">✦</span> Simulador Parcelado
+        </span>
+<div class="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-400/10 to-transparent"></div>
+</button>
+<button class="py-1.5 px-1 rounded text-center font-sans text-[11px] font-semibold text-slate-400 hover:text-cyan-200 hover:bg-slate-800/40 transition-all" type="button">
+        Importar OFX/CSV
+      </button>
+</div>
+</div>
+<!-- ================= 2. JANELA DE MENU 32-BIT COM CHANFROS LUMINOSOS ================= -->
+<div class="psx-window psx-corner-bracket rounded-xl p-4 space-y-4">
+<!-- Top Dialogue Title Bar with Celestial Glyphs & Bevel Line -->
+<div class="flex items-center justify-between pb-2.5 border-b border-cyan-500/30 -mx-1 px-1">
+<div class="flex items-center gap-2.5">
+<div class="w-7 h-7 rounded bg-gradient-to-br from-indigo-700 to-slate-900 border border-cyan-400/40 flex items-center justify-center text-cyan-300 shadow-[0_0_10px_rgba(56,189,248,0.3)]">
+<span class="material-symbols-outlined text-sm">credit_card_clock</span>
+</div>
+<div>
+<h2 class="font-cinzel font-bold text-sm tracking-wide text-cyan-100 leading-tight">Simular Compra no Cartão</h2>
+<p class="font-mono text-[10px] text-cyan-400/70">Análise preditiva de comprometimento futuro</p>
+</div>
+</div>
+<div class="flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_6px_#38bdf8]"></span>
+<span class="text-cyan-300 font-mono font-bold text-[10px] tracking-widest">◆ 32-BIT ◆</span>
+</div>
+</div>
+<!-- ================= 3. FORMULÁRIO DE SIMULAÇÃO INTUITIVO ================= -->
+<div class="space-y-3.5 bg-[#091024]/85 border border-cyan-900/60 p-3 rounded-lg shadow-inner">
+<!-- LINHA 1: DESCRIÇÃO DO ESPÓLIO -->
+<div class="space-y-1">
+<label class="block font-mono text-[10.5px] text-cyan-300/80 uppercase tracking-wider font-semibold">Item / Descrição do Espólio</label>
+<div class="relative flex items-center">
+<input class="w-full bg-[#070b18] border border-cyan-500/30 text-slate-100 font-sans text-xs py-2 pl-3 pr-24 rounded focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 shadow-inner" id="sim-desc" placeholder="Nome do item..." type="text" value="Espada Cósmica Lendária / Setup Workstation Pro"/>
+<span class="absolute right-2 px-2 py-0.5 rounded font-mono text-[10px] font-bold bg-fuchsia-950/80 border border-fuchsia-400/40 text-fuchsia-300 shadow-sm">#Trabalho</span>
+</div>
+</div>
+<!-- LINHA 2: CATEGORIA (RECIPIENTE DE MANA) -->
+<div class="space-y-1.5">
+<label class="block font-mono text-[10.5px] text-cyan-300/80 uppercase tracking-wider font-semibold">Recipiente de Mana (Categoria)</label>
+<div class="grid grid-cols-3 gap-1.5 text-center font-sans">
+<!-- Equipamento (Ativo) -->
+<div class="p-2 rounded bg-gradient-to-b from-cyan-500/25 to-indigo-950/70 border border-cyan-400/70 text-cyan-200 shadow-[0_0_12px_rgba(56,189,248,0.25)] cursor-pointer flex items-center justify-center gap-1.5">
+<span class="material-symbols-outlined text-sm text-cyan-300">handyman</span>
+<span class="font-bold text-[11px]">Equipamento</span>
+</div>
+<!-- Lazer -->
+<div class="p-2 rounded bg-[#091124] border border-slate-700/50 text-slate-400 hover:text-slate-200 hover:border-slate-500 transition-all cursor-pointer flex items-center justify-center gap-1.5">
+<span class="material-symbols-outlined text-sm">sports_esports</span>
+<span class="font-medium text-[11px]">Lazer</span>
+</div>
+<!-- Ofício -->
+<div class="p-2 rounded bg-[#091124] border border-slate-700/50 text-slate-400 hover:text-slate-200 hover:border-slate-500 transition-all cursor-pointer flex items-center justify-center gap-1.5">
+<span class="material-symbols-outlined text-sm">work</span>
+<span class="font-medium text-[11px]">Ofício</span>
+</div>
+</div>
+</div>
+<!-- LINHA 3: PREÇO & GRIMÓRIO DE PAGAMENTO -->
+<div class="grid grid-cols-2 gap-2.5">
+<div class="space-y-1">
+<label class="block font-mono text-[10.5px] text-cyan-300/80 uppercase tracking-wider font-semibold">Preço em Moedas</label>
+<div class="relative">
+<input class="w-full bg-[#070b18] border border-cyan-500/30 text-amber-300 font-mono font-bold text-sm py-1.5 px-2.5 rounded shadow-inner text-right focus:outline-none focus:border-amber-400" id="sim-total-amount" type="text" value="7.200,00"/>
+<span class="absolute left-2.5 top-2 font-mono text-[11px] text-cyan-400/80 font-bold">R$</span>
+</div>
+</div>
+<div class="space-y-1">
+<label class="block font-mono text-[10.5px] text-cyan-300/80 uppercase tracking-wider font-semibold">Grimório de Pagamento</label>
+<div class="bg-[#070b18] border border-cyan-500/30 p-0.5 rounded flex items-center h-[34px]">
+<button class="flex-1 h-full rounded font-mono text-[10px] font-bold bg-gradient-to-r from-fuchsia-600/40 to-indigo-600/50 border border-fuchsia-400/60 text-fuchsia-200 shadow-sm flex items-center justify-center gap-1" type="button">
+<span class="material-symbols-outlined text-xs">credit_card</span> Cartão Astral
+            </button>
+<button class="flex-1 h-full rounded font-mono text-[10px] text-slate-400 hover:text-white flex items-center justify-center gap-1 transition-all" type="button">
+<span class="material-symbols-outlined text-xs">bolt</span> Pix Imediato
+            </button>
+</div>
+</div>
+</div>
+<!-- LINHA 4: SELETOR DE PARCELAS EM BOTÕES 32-BIT -->
+<div class="space-y-1.5 pt-0.5">
+<div class="flex justify-between items-center font-mono">
+<span class="text-[10.5px] text-cyan-300/80 uppercase tracking-wider font-semibold">Divisão de Faturas</span>
+<span class="text-[11px] text-rose-400 font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">schedule</span> 12x de R$ 600,00 (sem juros)
+          </span>
+</div>
+<div class="grid grid-cols-5 gap-1.5 font-mono text-xs">
+<button class="py-1.5 rounded bg-[#091124] border border-slate-700/60 text-slate-400 hover:text-white hover:border-slate-500 transition-all font-semibold" type="button">1x</button>
+<button class="py-1.5 rounded bg-[#091124] border border-slate-700/60 text-slate-400 hover:text-white hover:border-slate-500 transition-all font-semibold" type="button">3x</button>
+<button class="py-1.5 rounded bg-[#091124] border border-slate-700/60 text-slate-400 hover:text-white hover:border-slate-500 transition-all font-semibold" type="button">6x</button>
+<button class="py-1.5 rounded bg-[#091124] border border-slate-700/60 text-slate-400 hover:text-white hover:border-slate-500 transition-all font-semibold" type="button">10x</button>
+<button class="py-1.5 rounded bg-gradient-to-b from-rose-600 via-rose-700 to-red-900 text-white font-bold border border-rose-400/80 shadow-[0_0_12px_rgba(244,63,94,0.45)] relative overflow-hidden" type="button">
+<span class="relative z-10">12x</span>
+<div class="absolute inset-0 bg-white/15 mix-blend-overlay"></div>
+</button>
+</div>
+<div class="flex items-center justify-between text-[10px] font-mono text-slate-400 pt-0.5">
+<span>Primeiro vencimento: <strong class="text-cyan-200">10 de Novembro</strong></span>
+<span class="text-rose-400 font-semibold">Término: Out/2026 (12 Luas)</span>
+</div>
+</div>
+</div>
+<!-- ================= 4. PAINEL DE ANÁLISE PREDITIVA & RESSONÂNCIA TEMPORAL ================= -->
+<div class="psx-window-danger rounded-xl p-3.5 space-y-3.5 border border-rose-500/50 shadow-xl">
+<!-- Top Alert Bar -->
+<div class="flex items-center justify-between border-b border-rose-500/30 pb-2">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded bg-rose-950/80 border border-rose-400/60 flex items-center justify-center text-rose-400 shadow-[0_0_8px_rgba(244,63,94,0.4)]">
+<span class="material-symbols-outlined text-sm animate-pulse">warning</span>
+</div>
+<span class="font-cinzel text-xs text-rose-200 tracking-wider uppercase font-bold">Cálculo de Ressonância Temporal</span>
+</div>
+<span class="px-2.5 py-0.5 rounded-full font-mono text-[9.5px] bg-rose-900/90 border border-rose-400 text-rose-100 font-bold tracking-wider animate-pulse shadow-[0_0_10px_rgba(239,68,68,0.5)] flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-rose-300"></span>
+          ⚠️ RISCO CRÍTICO (&gt;50%)
+        </span>
+</div>
+<!-- Métricas Comparativas de Impacto -->
+<div class="grid grid-cols-2 gap-2.5">
+<!-- Comprometimento de Renda -->
+<div class="bg-[#0b050d]/80 p-2.5 rounded-lg border border-rose-500/40 space-y-1 shadow-inner">
+<span class="font-mono text-[9.5px] text-rose-300/80 block uppercase tracking-wide">Comprometimento de Renda</span>
+<div class="flex items-baseline gap-1.5">
+<span class="font-mono text-xs text-slate-400">38.0%</span>
+<span class="material-symbols-outlined text-xs text-rose-400">trending_up</span>
+<span class="font-mono text-sm text-rose-300 font-extrabold">54.2%</span>
+</div>
+<div class="flex items-center gap-1 font-mono text-[9px] text-rose-400 font-bold">
+<span class="w-1.5 h-1.5 rounded-full bg-rose-500 shadow-[0_0_4px_#ef4444]"></span>
+<span>Teto Sagrado Rompido (&gt;50%)</span>
+</div>
+</div>
+<!-- Fatura de Novembro -->
+<div class="bg-[#0b050d]/80 p-2.5 rounded-lg border border-rose-500/30 space-y-1 shadow-inner">
+<span class="font-mono text-[9.5px] text-rose-300/80 block uppercase tracking-wide">Fatura de Novembro</span>
+<div class="flex items-baseline gap-1.5">
+<span class="font-mono text-xs text-slate-400 line-through">R$ 820</span>
+<span class="material-symbols-outlined text-xs text-rose-400">arrow_forward</span>
+<span class="font-mono text-sm text-rose-300 font-extrabold">R$ 1.420</span>
+</div>
+<span class="font-mono text-[9px] text-rose-400 font-semibold block leading-tight">+R$ 600,00 da nova obrigação</span>
+</div>
+<!-- Safe-to-Spend Diário -->
+<div class="bg-[#0b050d]/80 p-2.5 rounded-lg border border-rose-500/30 space-y-1 shadow-inner">
+<span class="font-mono text-[9.5px] text-rose-300/80 block uppercase tracking-wide">Safe-to-Spend Diário</span>
+<div class="flex items-baseline gap-1.5">
+<span class="font-mono text-xs text-slate-400">R$ 85/dia</span>
+<span class="material-symbols-outlined text-xs text-rose-400">trending_down</span>
+<span class="font-mono text-sm text-rose-300 font-extrabold">R$ 52/dia</span>
+</div>
+<span class="font-mono text-[9px] text-rose-400 font-semibold block leading-tight">-R$ 33/dia (Sufocamento de Mana)</span>
+</div>
+<!-- Duração do Feitiço -->
+<div class="bg-[#0b050d]/80 p-2.5 rounded-lg border border-rose-500/30 space-y-1 shadow-inner">
+<span class="font-mono text-[9.5px] text-rose-300/80 block uppercase tracking-wide">Duração do Feitiço</span>
+<div class="flex items-baseline gap-1.5">
+<span class="font-mono text-sm text-rose-300 font-extrabold">12 Luas</span>
+<span class="font-mono text-[10px] text-slate-400">consecutivas</span>
+</div>
+<span class="font-mono text-[9px] text-rose-400 block leading-tight font-medium">Aprisionamento Contínuo</span>
+</div>
+</div>
+<!-- Gráfico de Horizonte (Horizon Chart 32-Bit com Barras Contínuas) -->
+<div class="space-y-1.5 bg-[#09040a]/90 p-3 rounded-lg border border-rose-500/25 shadow-inner">
+<div class="flex justify-between items-center font-mono text-[10.5px]">
+<span class="text-rose-300 font-bold flex items-center gap-1.5">
+<span class="material-symbols-outlined text-xs text-rose-400">bar_chart</span>
+            Horizonte de Faturas (6 Luas)
+          </span>
+<div class="flex items-center gap-2 text-[9px]">
+<span class="flex items-center gap-1 text-slate-400">
+<span class="w-2 h-2 rounded-sm bg-indigo-900 border border-indigo-700"></span> Atual
+            </span>
+<span class="flex items-center gap-1 text-rose-400 font-bold">
+<span class="w-2 h-2 rounded-sm bg-rose-500 border border-rose-300 shadow-[0_0_4px_#ef4444]"></span> +R$ 600
+            </span>
+</div>
+</div>
+<!-- Visual Horizon SVG Bar Chart (ATB Specular Glow Style) -->
+<div class="w-full pt-1">
+<svg class="w-full h-20 overflow-visible" fill="none" viewbox="0 0 350 82" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<lineargradient id="barBaseGrad" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#3b4266"></stop>
+<stop offset="100%" stop-color="#181d33"></stop>
+</lineargradient>
+<lineargradient id="barHazardGrad" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#fb7185"></stop>
+<stop offset="50%" stop-color="#e11d48"></stop>
+<stop offset="100%" stop-color="#9f1239"></stop>
+</lineargradient>
+<filter height="140%" id="hazardGlow" width="140%" x="-20%" y="-20%">
+<fedropshadow dx="0" dy="0" flood-color="#f43f5e" flood-opacity="0.6" stddeviation="2"></fedropshadow>
+</filter>
+</defs>
+<!-- Teto Prudente R$ 1.200 Linha Tracejada -->
+<line stroke="#f43f5e" stroke-dasharray="3 3" stroke-width="1.5" x1="4" x2="346" y1="18" y2="18"></line>
+<text class="fill-rose-400 font-mono text-[8px] font-bold" text-anchor="end" x="346" y="13">⚠️ TETO PRUDENTE R$ 1.200 (ESTOURADO)</text>
+<!-- Mês 1: Nov (Total 1.420 -> Estourado) -->
+<rect fill="url(#barBaseGrad)" height="28" rx="2" width="38" x="10" y="44"></rect>
+<rect fill="url(#barHazardGrad)" filter="url(#hazardGlow)" height="26" rx="2" width="38" x="10" y="18"></rect>
+<text class="fill-slate-400 font-mono text-[8.5px]" text-anchor="middle" x="29" y="78">Nov</text>
+<text class="fill-rose-300 font-mono text-[8px] font-extrabold" text-anchor="middle" x="29" y="14">1.420</text>
+<!-- Mês 2: Dez (Total 1.540 -> Pico de Fim de Ano) -->
+<rect fill="url(#barBaseGrad)" height="32" rx="2" width="38" x="68" y="40"></rect>
+<rect fill="url(#barHazardGrad)" filter="url(#hazardGlow)" height="26" rx="2" width="38" x="68" y="14"></rect>
+<text class="fill-slate-400 font-mono text-[8.5px]" text-anchor="middle" x="87" y="78">Dez</text>
+<text class="fill-rose-300 font-mono text-[8px] font-extrabold" text-anchor="middle" x="87" y="10">1.540</text>
+<!-- Mês 3: Jan (Total 1.350) -->
+<rect fill="url(#barBaseGrad)" height="25" rx="2" width="38" x="126" y="47"></rect>
+<rect fill="url(#barHazardGrad)" filter="url(#hazardGlow)" height="26" rx="2" width="38" x="126" y="21"></rect>
+<text class="fill-slate-400 font-mono text-[8.5px]" text-anchor="middle" x="145" y="78">Jan</text>
+<text class="fill-rose-300 font-mono text-[8px] font-extrabold" text-anchor="middle" x="145" y="17">1.350</text>
+<!-- Mês 4: Fev (Total 1.200 -> No Limite) -->
+<rect fill="url(#barBaseGrad)" height="20" rx="2" width="38" x="184" y="52"></rect>
+<rect fill="url(#barHazardGrad)" filter="url(#hazardGlow)" height="26" rx="2" width="38" x="184" y="26"></rect>
+<text class="fill-slate-400 font-mono text-[8.5px]" text-anchor="middle" x="203" y="78">Fev</text>
+<text class="fill-rose-300 font-mono text-[8px] font-bold" text-anchor="middle" x="203" y="22">1.200</text>
+<!-- Mês 5: Mar (Total 1.110 -> Dentro) -->
+<rect fill="url(#barBaseGrad)" height="17" rx="2" width="38" x="242" y="55"></rect>
+<rect fill="url(#barHazardGrad)" height="26" rx="2" width="38" x="242" y="29"></rect>
+<text class="fill-slate-400 font-mono text-[8.5px]" text-anchor="middle" x="261" y="78">Mar</text>
+<text class="fill-cyan-200 font-mono text-[8px] font-medium" text-anchor="middle" x="261" y="25">1.110</text>
+<!-- Mês 6: Abr (Total 1.020 -> Dentro) -->
+<rect fill="url(#barBaseGrad)" height="14" rx="2" width="38" x="300" y="58"></rect>
+<rect fill="url(#barHazardGrad)" height="26" rx="2" width="38" x="300" y="32"></rect>
+<text class="fill-slate-400 font-mono text-[8.5px]" text-anchor="middle" x="319" y="78">Abr</text>
+<text class="fill-cyan-200 font-mono text-[8px] font-medium" text-anchor="middle" x="319" y="28">1.020</text>
+</svg>
+</div>
+</div>
+<!-- ================= 5. VEREDITO DO ORÁCULO & STORYTELLING EM 3 PASSOS ================= -->
+<div class="space-y-2 pt-1">
+<div class="p-3 rounded-lg bg-[#0e0612]/90 border border-rose-500/40 space-y-2.5">
+<!-- Passo 1: Contexto -->
+<div class="flex items-start gap-2">
+<span class="w-4 h-4 rounded bg-rose-900 border border-rose-500 text-rose-200 font-mono text-[10px] font-bold flex items-center justify-center mt-0.5 flex-shrink-0">1</span>
+<p class="font-sans text-[11px] text-slate-300 leading-snug">
+<strong class="text-rose-300 font-semibold font-mono">Contexto:</strong> Seu comprometimento com faturas salta para <strong class="text-rose-400 font-mono font-bold">54.2%</strong>, quebrando o teto sagrado de 50% instituído pelo conselho da guilda.
+            </p>
+</div>
+<!-- Passo 2: Tensão -->
+<div class="flex items-start gap-2">
+<span class="w-4 h-4 rounded bg-rose-950 border border-rose-700 text-rose-300 font-mono text-[10px] font-bold flex items-center justify-center mt-0.5 flex-shrink-0">2</span>
+<p class="font-sans text-[11px] text-slate-300 leading-snug">
+<strong class="text-rose-300 font-semibold font-mono">Tensão:</strong> Aprisiona <strong class="text-cyan-200 font-mono font-semibold">R$ 600,00</strong> todos os meses durante 1 ano inteiro, comprimindo o Safe-to-Spend para <strong class="text-rose-400 font-mono font-bold">R$ 52/dia</strong> e reduzindo seu fôlego para emergências.
+            </p>
+</div>
+<!-- Passo 3: Veredito e Ação Recomendada -->
+<div class="flex items-start gap-2.5 p-2.5 rounded bg-rose-950/70 border border-rose-400/50 shadow-[0_0_12px_rgba(244,63,94,0.25)]">
+<div class="w-7 h-7 rounded-full bg-gradient-to-tr from-fuchsia-600 to-rose-600 border border-rose-300 flex items-center justify-center text-white flex-shrink-0 shadow-[0_0_8px_#f43f5e]">
+<span class="material-symbols-outlined text-sm">shield_with_heart</span>
+</div>
+<div class="space-y-1">
+<span class="block font-cinzel text-xs font-bold text-rose-200 tracking-wide">⛔ ALERTA DO ORÁCULO: Compra Desaconselhada!</span>
+<p class="font-sans text-[11px] text-rose-100/90 leading-relaxed">
+                Risco severo de aprisionamento de mana por 12 luas consecutivas.
+                <span class="text-cyan-200 font-medium block mt-1">✨ Recomendação: Junte R$ 3.600 em dinheiro para entrada de 50% ou aguarde 4 meses até a quitação do Notebook Arcano antes de forjar este compromisso.</span>
+</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- ================= 6. BOTÕES DE AÇÃO E DIRETRIZES DA GUILDA ================= -->
+<div class="space-y-2 pt-1 font-sans">
+<!-- Botão Primário Recomendado (Gema Azul / Ciano Reluzente) -->
+<button class="w-full py-3 px-4 rounded-lg psx-cyan-gem text-slate-950 font-bold text-xs tracking-wider uppercase flex items-center justify-center gap-2 hover:brightness-110 active:scale-[0.99] transition-all font-cinzel" type="button">
+<span class="material-symbols-outlined text-base">tune</span>
+<span>✨ Recalcular com Entrada de 50% ou Cancelar</span>
+</button>
+<!-- Botão de Suporte (Oráculo IA) -->
+<button class="w-full py-2.5 px-3 rounded-lg bg-gradient-to-r from-indigo-900/80 via-purple-900/70 to-indigo-950/80 border border-purple-400/50 text-purple-200 font-bold text-xs tracking-wide shadow-md hover:brightness-110 transition-all flex items-center justify-center gap-2" type="button">
+<span class="material-symbols-outlined text-base text-purple-300">magic_button</span>
+<span>🔮 Consultar Alternativa Segura com Oráculo (IA)</span>
+</button>
+<!-- Botão de Advertência de Risco -->
+<button class="w-full py-2.5 px-3 rounded-lg bg-[#140810] border border-rose-500/60 hover:bg-rose-950/40 text-rose-300 font-semibold text-xs tracking-wide transition-all flex items-center justify-center gap-2" type="button">
+<span class="material-symbols-outlined text-base text-rose-400">warning</span>
+<span>⚠️ Forçar Parcelamento com Risco (Desafio da Guilda) [ 12x R$ 600 ]</span>
+</button>
+<button class="w-full py-1 text-center font-mono text-[11px] text-cyan-400/70 hover:text-cyan-200 transition-colors" type="button">
+        Descartar Simulação / Retornar à Taverna
+      </button>
+</div>
+<!-- Nota Informativa Contábil de Competência (32-Bit Ledger Note) -->
+<div class="pt-2.5 border-t border-cyan-500/20 flex items-start gap-2 text-cyan-400/70">
+<span class="material-symbols-outlined text-sm mt-0.5 text-cyan-400 flex-shrink-0">menu_book</span>
+<p class="font-mono text-[9.5px] leading-relaxed text-slate-300">
+<strong class="text-cyan-300">Regime de Competência:</strong> A 1ª parcela de R$ 600 entrará na fatura de Nov/2024 sem deduzir o saldo bancário de liquidez imediata hoje, programando 12 obrigações recorrentes no livro contábil da guilda.
+      </p>
+</div>
+</div>
+</main>
+<!-- ================= 7. BOTTOM TAB NAVIGATION BAR (HUD 32-BIT) ================= -->
+<nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-[#070b18]/95 backdrop-blur-md border-t border-cyan-500/40 px-3 py-1.5 z-50 flex items-center justify-around shadow-[0_-8px_25px_rgba(0,0,0,0.8)]">
+<!-- Taverna -->
+<button class="flex flex-col items-center gap-0.5 py-1 px-2 text-slate-400 hover:text-cyan-200 transition-all">
+<span class="material-symbols-outlined text-lg">castle</span>
+<span class="font-mono text-[9px] font-medium tracking-tight">Taverna</span>
+</button>
+<!-- Mapa -->
+<button class="flex flex-col items-center gap-0.5 py-1 px-2 text-slate-400 hover:text-cyan-200 transition-all">
+<span class="material-symbols-outlined text-lg">explore</span>
+<span class="font-mono text-[9px] font-medium tracking-tight">Mapa</span>
+</button>
+<!-- Center Action Button: Forjar (Ativo com Orbe Luminoso & Espadas) -->
+<button class="relative -top-3 flex flex-col items-center group">
+<div class="w-12 h-12 rounded-full bg-gradient-to-tr from-cyan-400 via-sky-500 to-indigo-600 p-[2px] shadow-[0_0_18px_rgba(56,189,248,0.7)] group-hover:scale-105 group-active:scale-95 transition-all">
+<div class="w-full h-full bg-[#0a1226] rounded-full flex items-center justify-center text-cyan-300 relative overflow-hidden border border-cyan-300/40">
+<span class="material-symbols-outlined text-xl">swords</span>
+<div class="absolute inset-0 bg-cyan-400/20 rounded-full animate-ping opacity-30"></div>
+</div>
+</div>
+<span class="font-mono text-[8.5px] font-bold text-cyan-300 tracking-wider mt-0.5 drop-shadow-[0_0_6px_#38bdf8]">Forjar</span>
+</button>
+<!-- Guilda -->
+<button class="flex flex-col items-center gap-0.5 py-1 px-2 text-slate-400 hover:text-cyan-200 transition-all">
+<span class="material-symbols-outlined text-lg">shield</span>
+<span class="font-mono text-[9px] font-medium tracking-tight">Guilda</span>
+</button>
+<!-- Oráculo -->
+<button class="flex flex-col items-center gap-0.5 py-1 px-2 text-slate-400 hover:text-cyan-200 transition-all relative">
+<span class="material-symbols-outlined text-lg">magic_button</span>
+<span class="font-mono text-[9px] font-medium tracking-tight">Oráculo</span>
+<span class="absolute top-1 right-2.5 w-1.5 h-1.5 rounded-full bg-fuchsia-400 shadow-[0_0_6px_#f472b6]"></span>
+</button>
+</nav>
+</div>
+</body></html>
